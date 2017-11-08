@@ -22,8 +22,8 @@ class RouterProvider implements ServiceProviderInterface
                 $router->setDefaultController('index');
                 $router->setDefaultAction('index');
 
-                /* 载入自定义路由
-                 *
+                /*
+                 * 载入自定义路由
                  */
                 if ($routes = $this->getConfig()->get('routes')) {
                     $this->getLogger()->info(json_encode($routes));

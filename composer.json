@@ -1,0 +1,26 @@
+{
+  "name": "uniondrug/framework",
+  "type": "library",
+  "description": "A mini framework based on phalcon",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "UnionDrug Dev",
+      "email": "xueronni@uniondrug.cn"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "ext-phalcon": "^3.2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pails\\": "src/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "prefer-stable": true
+}

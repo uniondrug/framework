@@ -1,9 +1,8 @@
 <?php
 /**
- * LoggerProvider.php
+ * 日志服务注册
  *
  */
-
 namespace Pails\Providers;
 
 use Phalcon\Di\ServiceProviderInterface;
@@ -14,16 +13,16 @@ class LoggerProvider implements ServiceProviderInterface
     public function register(\Phalcon\DiInterface $di)
     {
         // logger
-        $di->setShared(
+        $di->set(
             'logger',
-            function () {
+            function ($logCategory = 'app') {
                 $month = date('Y-m');
                 $date = date('Y-m-d');
                 if ($this->getConfig()->path('logger.splitDir', false)) {
-                    $logPath = $this->logPath() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR;
+                    $logPath = $this->logPath() . DIRECTORY_SEPARATOR . $logCategory . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR;
                     $logFile = $logPath . $date . '.log';
                 } else {
-                    $logPath = $this->logPath() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR;
+                    $logPath = $this->logPath() . DIRECTORY_SEPARATOR . $logCategory . DIRECTORY_SEPARATOR;
                     $logFile = $logPath . $date . '.log';
                 }
                 if (!@file_exists($logPath)) {

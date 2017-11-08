@@ -3,7 +3,6 @@ namespace Pails\Providers;
 
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Di\ServiceProviderInterface;
-use Phalcon\Logger\Adapter\File;
 
 class DatabaseProvider implements ServiceProviderInterface
 {
@@ -16,7 +15,7 @@ class DatabaseProvider implements ServiceProviderInterface
                 if ($config) {
                     $db = new Mysql($config->connection->toArray());
                     if ($config->debug) {
-                        $logger = new File($this->logPath() . '/db_debug.log');
+                        $logger = $this->getLogger('db');
                         $this->getEventsManager()->attach(
                             'db',
                             function ($event, $connection) use ($logger) {
@@ -47,7 +46,7 @@ class DatabaseProvider implements ServiceProviderInterface
         /**
          * set readonly connection
          */
-        if ((true === $di->getConfig()->path('database.useSlave')) && $di->getConfig()->path('database.slaveConnection')) {
+        if ((true === $di->getConfig()->path('database.useSlave', false)) && $di->getConfig()->path('database.slaveConnection', false)) {
             $di->set(
                 'dbSlave',
                 function () {
@@ -55,7 +54,7 @@ class DatabaseProvider implements ServiceProviderInterface
                     if ($config) {
                         $db = new Mysql($config->slaveConnection->toArray());
                         if ($config->debug) {
-                            $logger = new File($this->logPath() . '/dbSlave_debug.log');
+                            $logger = $this->getLogger('dbSlave');
                             $this->getEventsManager()->attach(
                                 'dbSlave',
                                 function ($event, $connection) use ($logger) {

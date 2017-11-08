@@ -1,7 +1,6 @@
 <?php
 /**
- * Application.php
- *
+ * 应用入口
  */
 namespace Pails;
 
