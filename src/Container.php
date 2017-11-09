@@ -144,7 +144,7 @@ final class Container extends Di
                 $this->getShared('response')->setJsonContent([])->send();
             }
         } catch (\Exception $e) {
-            $this->getLogger()->error("System Error: " . $e->getMessage());
+            $this->getLogger()->error("System Error: " . $e->getMessage() . ". \nTrace: \n" . $e->getTraceAsString());
 
             if ($this->getConfig()->path('app.debug', false)) {
                 /**
@@ -156,8 +156,8 @@ final class Container extends Di
                  * 非Debug模式，直接输出一个Json
                  */
                 $this->getShared('response')->setJsonContent([
-                    'success' => false,
-                    'msg'     => "System Error: " . $e->getMessage(),
+                    'errno' => "-1",
+                    'error' => "System Error: " . $e->getMessage(),
                 ])->send();
             }
         }
