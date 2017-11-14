@@ -1,11 +1,10 @@
 <?php
 /**
  * Uniondrug Api Framework
- *
  * 容器
- *
  * @author Unindrug
  */
+
 namespace Pails;
 
 use Pails\Providers\ConfigProvider;
@@ -19,11 +18,11 @@ use Phalcon\Text;
 
 /**
  * Class Container
- *
  * @package Pails
  */
 final class Container extends Di
 {
+
     /**
      * 版本号
      */
@@ -31,21 +30,18 @@ final class Container extends Di
 
     /**
      * 当前环境
-     *
      * @var null
      */
     private $env = null;
 
     /**
      * 应用路径
-     *
      * @var
      */
     protected $baseDir;
 
     /**
      * 系统服务
-     *
      * @var array
      */
     protected $_providers = [
@@ -74,17 +70,17 @@ final class Container extends Di
 
         // 设置默认的服务
         $this->_services = [
-            "dispatcher"         => new Service("dispatcher", "Phalcon\\Mvc\\Dispatcher", true),
-            "url"                => new Service("url", "Phalcon\\Mvc\\Url", true),
-            "modelsManager"      => new Service("modelsManager", "Phalcon\\Mvc\\Model\\Manager", true),
-            "modelsMetadata"     => new Service("modelsMetadata", "Phalcon\\Mvc\\Model\\MetaData\\Memory", true),
-            "response"           => new Service("response", "Phalcon\\Http\\Response", true),
-            "request"            => new Service("request", "Phalcon\\Http\\Request", true),
-            "filter"             => new Service("filter", "Phalcon\\Filter", true),
-            "escaper"            => new Service("escaper", "Phalcon\\Escaper", true),
-            "security"           => new Service("security", "Phalcon\\Security", true),
-            "crypt"              => new Service("crypt", "Phalcon\\Crypt", true),
-            "eventsManager"      => new Service("eventsManager", "Phalcon\\Events\\Manager", true),
+            "dispatcher" => new Service("dispatcher", "Phalcon\\Mvc\\Dispatcher", true),
+            "url" => new Service("url", "Phalcon\\Mvc\\Url", true),
+            "modelsManager" => new Service("modelsManager", "Phalcon\\Mvc\\Model\\Manager", true),
+            "modelsMetadata" => new Service("modelsMetadata", "Phalcon\\Mvc\\Model\\MetaData\\Memory", true),
+            "response" => new Service("response", "Phalcon\\Http\\Response", true),
+            "request" => new Service("request", "Phalcon\\Http\\Request", true),
+            "filter" => new Service("filter", "Phalcon\\Filter", true),
+            "escaper" => new Service("escaper", "Phalcon\\Escaper", true),
+            "security" => new Service("security", "Phalcon\\Security", true),
+            "crypt" => new Service("crypt", "Phalcon\\Crypt", true),
+            "eventsManager" => new Service("eventsManager", "Phalcon\\Events\\Manager", true),
             "transactionManager" => new Service("transactionManager", "Phalcon\\Mvc\\Model\\Transaction\\Manager", true),
         ];
 
@@ -118,8 +114,35 @@ final class Container extends Di
         $value || $value = $default;
 
         // 4. 同步属性并返回
-        $this->env = $value;
+        $this->env = strtolower($value);
         return $this->env;
+    }
+
+    /**
+     * 是否为开发环境
+     * @return bool
+     */
+    public function isDevelopment()
+    {
+        return $this->env === "development";
+    }
+
+    /**
+     * 是否为生产环境
+     * @return bool
+     */
+    public function isProduction()
+    {
+        return $this->env === "production";
+    }
+
+    /**
+     * 是否为测试环境
+     * @return bool
+     */
+    public function isTesting()
+    {
+        return $this->env === "testing";
     }
 
     /**
@@ -186,41 +209,37 @@ final class Container extends Di
 
     /**
      * Helpers: Get the path to the application directory.
-     *
      * @return string
      */
     public function appPath()
     {
-        return $this->baseDir . DIRECTORY_SEPARATOR . 'app';
+        return $this->baseDir.DIRECTORY_SEPARATOR.'app';
     }
 
     /**
      * Helpers: Get the path to the application configuration files.
-     *
      * @return string
      */
     public function configPath()
     {
-        return $this->baseDir . DIRECTORY_SEPARATOR . 'config';
+        return $this->baseDir.DIRECTORY_SEPARATOR.'config';
     }
 
     /**
      * Helpers: Get the path to the log directory.
-     *
      * @return string
      */
     public function logPath()
     {
-        return $this->baseDir . DIRECTORY_SEPARATOR . 'log';
+        return $this->baseDir.DIRECTORY_SEPARATOR.'log';
     }
 
     /**
      * Helpers: Get the path to the tmp directory.
-     *
      * @return string
      */
     public function tmpPath()
     {
-        return $this->baseDir . DIRECTORY_SEPARATOR . 'tmp';
+        return $this->baseDir.DIRECTORY_SEPARATOR.'tmp';
     }
 }
