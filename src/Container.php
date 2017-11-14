@@ -6,7 +6,6 @@
  *
  * @author Unindrug
  */
-
 namespace Pails;
 
 use Pails\Providers\ConfigProvider;
@@ -103,19 +102,23 @@ final class Container extends Di
      */
     public function environment()
     {
-        $default = 'development';
+        // 1. 优先用属性配置
         if ($this->env) {
             return $this->env;
         }
 
+        // 2. 读环境变量
+        $default = 'development';
         $value = getenv('APP_ENV');
-        if (Text::startsWith($value, '"') && Text::endsWith($value, '"')) {
+        if ($value && Text::startsWith($value, '"') && Text::endsWith($value, '"')) {
             $value = substr($value, 1, -1);
         }
-        if ($value === false || !$value) {
-            $this->env = $default;
-        }
 
+        // 3. 使用默认
+        $value || $value = $default;
+
+        // 4. 同步属性并返回
+        $this->env = $value;
         return $this->env;
     }
 
@@ -146,8 +149,8 @@ final class Container extends Di
             } else {
                 $this->getShared('response')->setJsonContent([])->send();
             }
-        } catch (\Exception $e) {
-            $this->getLogger()->error("System Error: " . $e->getMessage() . ". \nTrace: \n" . $e->getTraceAsString());
+        } catch(\Exception $e) {
+            $this->getLogger()->error("System Error: ".$e->getMessage().". \nTrace: \n".$e->getTraceAsString());
 
             if ($this->getConfig()->path('app.debug', false)) {
                 /**
@@ -160,7 +163,7 @@ final class Container extends Di
                  */
                 $this->getShared('response')->setJsonContent([
                     'errno' => "-1",
-                    'error' => "System Error: " . $e->getMessage(),
+                    'error' => "System Error: ".$e->getMessage(),
                 ])->send();
             }
         }
@@ -174,7 +177,7 @@ final class Container extends Di
     public function setBaseDir($baseDir)
     {
         if (!file_exists($baseDir) || !is_dir($baseDir)) {
-            throw new \RuntimeException('Invalid baseDir: \"' . $baseDir . '\" not exists or is not a dir.');
+            throw new \RuntimeException('Invalid baseDir: \"'.$baseDir.'\" not exists or is not a dir.');
         }
         $this->baseDir = rtrim($baseDir, '\/');
 
