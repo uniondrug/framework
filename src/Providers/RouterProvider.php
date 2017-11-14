@@ -26,7 +26,6 @@ class RouterProvider implements ServiceProviderInterface
                  * 载入自定义路由
                  */
                 if ($routes = $this->getConfig()->get('routes')) {
-                    $this->getLogger()->info(json_encode($routes));
                     foreach ($routes as $pattern => $route) {
                         if (is_string($route)) {
                             $router->add($pattern, $route);
