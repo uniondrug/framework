@@ -35,7 +35,7 @@ abstract class TestsController extends Controller
     final public function onConstruct()
     {
         $this->dispatcher->setActionName("index");
-        if (!$this->di->isProduction()) {
+        if ($this->di->isProduction()) {
             throw new \Exception("单元测试不对生产环境开放");
         }
     }

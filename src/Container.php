@@ -173,7 +173,7 @@ final class Container extends Di
                 $this->getShared('response')->setJsonContent([])->send();
             }
         } catch(\Exception $e) {
-            $this->getLogger()->error("System Error: ".$e->getMessage().". \nTrace: \n".$e->getTraceAsString());
+            $this->getLogger('error')->error("System Error: ".$e->getMessage().". \nTrace: \n".$e->getTraceAsString());
 
             if ($this->getConfig()->path('app.debug', false)) {
                 /**

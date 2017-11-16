@@ -19,7 +19,7 @@ abstract class ServiceClientController extends Controller
     /**
      * @var \UniondrugServiceClient\Request
      */
-    protected $serviceClient;
+    public $serviceClient;
 
     /**
      * 构造

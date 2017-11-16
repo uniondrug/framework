@@ -37,7 +37,6 @@ class DatabaseProvider implements ServiceProviderInterface
 
                     return $db;
                 } else {
-                    $this->getLogger()->error('No database config found. please check config file exists or APP_ENV is configed');
                     throw new \RuntimeException('No database config found. please check config file exists or APP_ENV is configed');
                 }
             }
@@ -76,7 +75,6 @@ class DatabaseProvider implements ServiceProviderInterface
 
                         return $db;
                     } else {
-                        $this->getLogger()->error('No readonly database config found. please check config file exists or APP_ENV is configed');
                         throw new \RuntimeException('No readonly database config found. please check config file exists or APP_ENV is configed');
                     }
                 }

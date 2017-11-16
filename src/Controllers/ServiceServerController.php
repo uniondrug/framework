@@ -19,7 +19,7 @@ abstract class ServiceServerController extends Controller
     /**
      * @var \UniondrugServiceServer\Response
      */
-    protected $serviceServer;
+    public $serviceServer;
 
     /**
      * 构造
