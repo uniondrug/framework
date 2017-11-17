@@ -93,7 +93,7 @@ class ExampleService extends RelateChildService
             * `insert()` - 添加新记录
             * `update()` - 修改记录
             * `updateById()` - 按记录ID修改
-            * `Pails\Services\SingleChildService{}`
+            * **Pails\Services\SingleChildService{}**
                 * `fetchChild()` - 读取一条下级记录
                 * `fetchChildren()` - 读取下级记录列表
                 * `fetchTree()` - 读取树形结构
@@ -107,7 +107,7 @@ class ExampleService extends RelateChildService
             * `insert()` - 添加新记录
             * `update()` - 修改记录
             * `updateById()` - 按记录ID修改
-            * `Pails\Services\RelateChildService{}`
+            * **Pails\Services\RelateChildService{}**
                 * `fetchChild()` - 读取一条下级记录
                 * `fetchChildren()` - 读取下级记录列表
                 * `fetchTree()` - 读取树形结构
