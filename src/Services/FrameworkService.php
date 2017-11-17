@@ -34,20 +34,16 @@ abstract class FrameworkService extends Injectable
      * 读取指定模型的递增流水号字段名
      *
      * @param Model $model
+     *
+     * @return null|string
      */
     public function getAutoIncrementColumn(& $model)
     {
-
-        return null;
-
         $primaryKeys = $model->getModelsMetaData()->getPrimaryKeyAttributes($model);
-        if (count($primaryKeys) > 0){
-            $primaryKey = $primaryKeys[0];
-            return $model->$primaryKey;
+        if (count($primaryKeys) > 0) {
+            return (string) $primaryKeys[0];
         }
-
-        print_r ($primaryKeys);
-        exit;
+        return null;
     }
 
     /**
