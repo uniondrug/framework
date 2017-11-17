@@ -66,13 +66,13 @@ class ExampleService extends RelateChildService
 }
 ```
 
-1. `Phalcon\Di\Injectable{}`
+1. **Phalcon\Di\Injectable{}**
     1. `__get()`
     1. `getDI()`
     1. `getEventsManager()`
     1. `setDI()`
     1. `setEventsManager()`
-    1. `Pails\Services\FrameworkService{}`
+    1. **Pails\Services\FrameworkService{}**
         1. `fetchAll()` - 按条件读取全部
         1. `fetchCount()` - 按条件读取数量
         1. `fetchOne()` - 按条件读取一条
@@ -84,7 +84,7 @@ class ExampleService extends RelateChildService
         1. `hasError()` - 检查是否有错误
         1. `setError()` - 设置最近的错误
         1. `setModel()` - 设置Service对应的Model, 若不指定则自动识别
-        1. `Pails\Services\SingleService{}`
+        1. **Pails\Services\SingleService{}**
             1. `delete()` - 批量删除
             1. `deleteById()` - 按ID删除
             1. `fetchAllByColumn()` - 按指定字段读取全部
@@ -98,7 +98,7 @@ class ExampleService extends RelateChildService
                 1. `fetchChildren()` - 读取下级记录列表
                 1. `fetchTree()` - 读取树形结构
                 1. `hasChild()` - 检查是否有下级记录
-        1. `Pails\Services\RelateService{}`
+        1. **Pails\Services\RelateService{}**
             1. `delete()` - 批量删除
             1. `deleteById()` - 按ID删除
             1. `fetchAllByColumn()` - 按指定字段读取全部
