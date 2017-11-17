@@ -66,52 +66,52 @@ class ExampleService extends RelateChildService
 }
 ```
 
-1. **Phalcon\Di\Injectable{}**
-    1. `__get()`
-    1. `getDI()`
-    1. `getEventsManager()`
-    1. `setDI()`
-    1. `setEventsManager()`
-    1. **Pails\Services\FrameworkService{}**
-        1. `fetchAll()` - 按条件读取全部
-        1. `fetchCount()` - 按条件读取数量
-        1. `fetchOne()` - 按条件读取一条
-        1. `fetchPaging()` - 按条件读取分页
-        1. `getAutoIncrementColumn()` - 读取模型的流水号ID字段名称
-        1. `getError()` - 读取最的的错误
-        1. `getErrorMessage()` - 读取最近的错误原因
-        1. `getModel()` - 读取Service对应的Model
-        1. `hasError()` - 检查是否有错误
-        1. `setError()` - 设置最近的错误
-        1. `setModel()` - 设置Service对应的Model, 若不指定则自动识别
-        1. **Pails\Services\SingleService{}**
-            1. `delete()` - 批量删除
-            1. `deleteById()` - 按ID删除
-            1. `fetchAllByColumn()` - 按指定字段读取全部
-            1. `fetchOneByColumn()` - 按指定字段读取一条
-            1. `fetchOneById()` - 按ID读取一条
-            1. `insert()` - 添加新记录
-            1. `update()` - 修改记录
-            1. `updateById()` - 按记录ID修改
-            1. `Pails\Services\SingleChildService{}`
-                1. `fetchChild()` - 读取一条下级记录
-                1. `fetchChildren()` - 读取下级记录列表
-                1. `fetchTree()` - 读取树形结构
-                1. `hasChild()` - 检查是否有下级记录
-        1. **Pails\Services\RelateService{}**
-            1. `delete()` - 批量删除
-            1. `deleteById()` - 按ID删除
-            1. `fetchAllByColumn()` - 按指定字段读取全部
-            1. `fetchOneByColumn()` - 按指定字段读取一条
-            1. `fetchOneById()` - 按ID读取一条
-            1. `insert()` - 添加新记录
-            1. `update()` - 修改记录
-            1. `updateById()` - 按记录ID修改
-            1. `Pails\Services\RelateChildService{}`
-                1. `fetchChild()` - 读取一条下级记录
-                1. `fetchChildren()` - 读取下级记录列表
-                1. `fetchTree()` - 读取树形结构
-                1. `hasChild()` - 检查是否有下级记录
+* **Phalcon\Di\Injectable{}**
+    * `__get()`
+    * `getDI()`
+    * `getEventsManager()`
+    * `setDI()`
+    * `setEventsManager()`
+    * **Pails\Services\FrameworkService{}**
+        * `fetchAll()` - 按条件读取全部
+        * `fetchCount()` - 按条件读取数量
+        * `fetchOne()` - 按条件读取一条
+        * `fetchPaging()` - 按条件读取分页
+        * `getAutoIncrementColumn()` - 读取模型的流水号ID字段名称
+        * `getError()` - 读取最的的错误
+        * `getErrorMessage()` - 读取最近的错误原因
+        * `getModel()` - 读取Service对应的Model
+        * `hasError()` - 检查是否有错误
+        * `setError()` - 设置最近的错误
+        * `setModel()` - 设置Service对应的Model, 若不指定则自动识别
+        * **Pails\Services\SingleService{}**
+            * `delete()` - 批量删除
+            * `deleteById()` - 按ID删除
+            * `fetchAllByColumn()` - 按指定字段读取全部
+            * `fetchOneByColumn()` - 按指定字段读取一条
+            * `fetchOneById()` - 按ID读取一条
+            * `insert()` - 添加新记录
+            * `update()` - 修改记录
+            * `updateById()` - 按记录ID修改
+            * `Pails\Services\SingleChildService{}`
+                * `fetchChild()` - 读取一条下级记录
+                * `fetchChildren()` - 读取下级记录列表
+                * `fetchTree()` - 读取树形结构
+                * `hasChild()` - 检查是否有下级记录
+        * **Pails\Services\RelateService{}**
+            * `delete()` - 批量删除
+            * `deleteById()` - 按ID删除
+            * `fetchAllByColumn()` - 按指定字段读取全部
+            * `fetchOneByColumn()` - 按指定字段读取一条
+            * `fetchOneById()` - 按ID读取一条
+            * `insert()` - 添加新记录
+            * `update()` - 修改记录
+            * `updateById()` - 按记录ID修改
+            * `Pails\Services\RelateChildService{}`
+                * `fetchChild()` - 读取一条下级记录
+                * `fetchChildren()` - 读取下级记录列表
+                * `fetchTree()` - 读取树形结构
+                * `hasChild()` - 检查是否有下级记录
 
 
 ### 微服务用法
