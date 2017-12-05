@@ -6,12 +6,18 @@
  */
 namespace Pails\Services;
 
+use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Di\Injectable;
 use Phalcon\Exception;
 use Phalcon\Mvc\Model;
 use Phalcon\Mvc\ModelInterface;
 use Phalcon\Paginator\Adapter\QueryBuilder;
 
+/**
+ * @property Mysql $db
+ * @property Mysql $dbSlave
+ * @package Pails\Services
+ */
 abstract class FrameworkService extends Injectable
 {
     /**
