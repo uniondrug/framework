@@ -27,7 +27,7 @@ abstract class ServiceServerController extends Controller
      */
     public function onConstruct()
     {
-        $this->serviceServer = new \UniondrugServiceServer\Response();
+        $this->serviceServer = new \UniondrugServiceServer\Server();
     }
 
     /**
