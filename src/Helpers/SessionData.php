@@ -1,11 +1,15 @@
 <?php
 /**
- * cn.uniondrug.app.insurance
+ * 框架级Helper
  * @author wsfuyibing <websearch@163.com>
  * @date 2017-12-18
  */
 namespace Pails\Helpers;
 
+/**
+ * 用户级Session数据结构
+ * @package Pails\Helpers
+ */
 class SessionData extends Session
 {
     private $memberId = 0;
@@ -14,6 +18,11 @@ class SessionData extends Session
     private $timestamp = 0;
     private $cookieValue = '';
 
+    /**
+     * 构造Session数据结构
+     *
+     * @param string $value 浏览器存储的Cookie值
+     */
     public function __construct($value)
     {
         $this->cookieValue = $value;
@@ -26,6 +35,14 @@ class SessionData extends Session
         }
     }
 
+    /**
+     * 读取Session数据结构的字段值
+     *
+     * @param string $key 属性名称
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     public function __get($key)
     {
         if (property_exists($this, $key)) {
@@ -34,11 +51,23 @@ class SessionData extends Session
         throw new \Exception("属性'{$key}'未定义");
     }
 
+    /**
+     * 只读属性, 禁止修改
+     *
+     * @param string $key
+     * @param int    $value
+     *
+     * @throws \Exception
+     */
     public function __set($key, $value)
     {
         throw new \Exception("只读属性'{$key}'禁止修改");
     }
 
+    /**
+     * 读取当前Session数据结构对应到浏览器端存储的Cookie值
+     * @return string
+     */
     public function getValue()
     {
         return $this->cookieValue;
@@ -85,21 +114,44 @@ class SessionData extends Session
         return false;
     }
 
+    /**
+     * C端会员登录
+     *
+     * @param int $memberId 用户ID
+     *
+     * @return bool
+     */
     public function login($memberId)
     {
         return $this->set($memberId, 0, 0);
     }
 
+    /**
+     * A/B/C端用户退出登录
+     * @return bool
+     */
     public function logout()
     {
         return $this->set(0, 0, 0);
     }
 
+    /**
+     * B端商户登录
+     *
+     * @param int $accountId 账号ID
+     * @param int $merchantId 商户ID
+     *
+     * @return bool
+     */
     public function merchantLogin($accountId, $merchantId)
     {
         return $this->set(0, $accountId, $merchantId);
     }
 
+    /**
+     * Session数据转数组
+     * @return array
+     */
     public function toArray()
     {
         return [
@@ -119,6 +171,15 @@ class SessionData extends Session
         return false;
     }
 
+    /**
+     * 以登录/退出时以私有方法修改属性值
+     *
+     * @param int $memberId C类会员ID
+     * @param int $accountId B类账号ID
+     * @param int $merchantId B类商户ID
+     *
+     * @return bool
+     */
     private function set($memberId, $accountId, $merchantId)
     {
         $this->memberId = $memberId;

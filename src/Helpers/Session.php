@@ -1,6 +1,6 @@
 <?php
 /**
- * cn.uniondrug.app.insurance
+ * 框架级Helper
  * @author wsfuyibing <websearch@163.com>
  * @date 2017-12-18
  */
@@ -9,6 +9,10 @@ namespace Pails\Helpers;
 use Phalcon\Config;
 use Phalcon\Di;
 
+/**
+ * 用户级Session基类
+ * @package Pails\Helpers
+ */
 abstract class Session extends \stdClass
 {
     const DEADLINE_NO = 3600;           // 未登录时Session有效期
@@ -19,6 +23,13 @@ abstract class Session extends \stdClass
      */
     private static $connection;
 
+    /**
+     * 从Redis读取数据
+     *
+     * @param string $value 浏览器存储的Cookie值
+     *
+     * @return array
+     */
     protected function openStorage($value)
     {
         $key = $this->generateStorageKey($value);
@@ -26,8 +37,10 @@ abstract class Session extends \stdClass
     }
 
     /**
-     * @param string      $value
-     * @param SessionData $data
+     * 将数据写入到Redis并更新过期时间
+     *
+     * @param string      $value 浏览器存储的Cookie值
+     * @param SessionData $data 数据结构
      *
      * @return bool
      */

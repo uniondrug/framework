@@ -1,17 +1,27 @@
 <?php
 /**
- * cn.uniondrug.app.insurance
+ * 框架级Helper
  * @author wsfuyibing <websearch@163.com>
  * @date 2017-12-18
  */
 namespace Pails\Helpers;
 
+/**
+ * 用户级Session客户端
+ * @package Pails\Helpers
+ */
 class SessionClient extends Session
 {
+    /**
+     * @var string 存储在浏览器端的Cookie名称
+     */
     private static $name = 'UGCLI';
     private static $value;
     private static $data;
 
+    /**
+     * 初始化Session客户端
+     */
     public function __construct()
     {
         if (isset($_COOKIE[self::$name]) && $_COOKIE[self::$name] !== "") {
@@ -27,6 +37,7 @@ class SessionClient extends Session
     }
 
     /**
+     * 读取Session数据结构
      * @return SessionData
      */
     public function getData()
@@ -55,7 +66,7 @@ class SessionClient extends Session
     /**
      * 验证Cookie值合法性
      *
-     * @param string $value
+     * @param string $value 检查Cookie值是否合法
      *
      * @return bool
      */
