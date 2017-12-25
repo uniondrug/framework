@@ -18,6 +18,11 @@
 │   ├── ServiceClientController.php         // Service客户端
 │   ├── ServiceServerController.php         // Service服务端
 │   └── TestsController.php                 // 单元测试调度
+├── Helpers
+│   ├── ImageSize.php
+│   ├── Session.php
+│   ├── SessionClient.php
+│   └── SessionData.php
 ├── Interfaces
 │   ├── RelateChildInterface.php
 │   ├── RelateFetchInterface.php
@@ -112,7 +117,3 @@ class ExampleService extends RelateChildService
                 * `fetchChildren()` - 读取下级记录列表
                 * `fetchTree()` - 读取树形结构
                 * `hasChild()` - 检查是否有下级记录
-
-
-### 微服务用法
-
