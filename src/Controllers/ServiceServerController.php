@@ -6,7 +6,8 @@
  */
 namespace Pails\Controllers;
 
-use \Phalcon\Mvc\Controller;
+use Phalcon\Mvc\Controller;
+use UniondrugServiceServer\Server;
 
 /**
  * 微服务服务端基类控制器
@@ -16,7 +17,7 @@ use \Phalcon\Mvc\Controller;
 abstract class ServiceServerController extends Controller
 {
     /**
-     * @var \UniondrugServiceServer\Response
+     * @var Server
      */
     public $serviceServer;
     private $serviceJsonRawBody;
@@ -27,7 +28,7 @@ abstract class ServiceServerController extends Controller
      */
     public function onConstruct()
     {
-        $this->serviceServer = new \UniondrugServiceServer\Server();
+        $this->serviceServer = new Server();
     }
 
     /**

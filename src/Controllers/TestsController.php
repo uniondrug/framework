@@ -8,7 +8,7 @@
 namespace Pails\Controllers;
 
 use Pails\Container;
-use \Phalcon\Mvc\Controller;
+use Phalcon\Mvc\Controller;
 
 /**
  * 如何创建单元测试
