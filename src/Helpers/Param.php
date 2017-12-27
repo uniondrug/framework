@@ -105,7 +105,7 @@ class Param extends \stdClass
                 }
             }
             // [2.4] 空值检查
-            if ($json->$key === '') {
+            if (isset($json->$key) && $json->$key === '') {
                 if ($rule['empty']) {
                     continue;
                 } else {
