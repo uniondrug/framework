@@ -94,25 +94,25 @@ class Param extends \stdClass
                 throw new \Exception("字段'{$key}'接受的数据类型未定义");
             }
             // [2.3] 必须字段未传递
-            if ($rule['required'] && !isset($json->$key)) {
-                if (isset($rule['default'])) {
-                    // [2.3.1] 从默认值中提取
-                    $json->$key = $rule['default'];
-                    continue;
-                } else {
-                    // [2.3.2] 必须字段
-                    throw new ParamException("字段'{$key}'未传递");
-                }
-            }
-            // [2.4] 空值检查
-            if (isset($json->$key) && $json->$key === '') {
-                if ($rule['empty']) {
-                    continue;
-                } else {
+            if (isset($json->$key)) {
+                if ($json->$key === "") {
+                    if ($rule['empty']) {
+                        continue;
+                    }
                     throw new ParamException("字段'{$key}'的值不能为空");
                 }
+            } else {
+                if ($rule['required']) {
+                    // [2.3.1] 必须字段
+                    throw new ParamException("字段'{$key}'未传递");
+                }
+                if (isset($rule['default'])) {
+                    // [2.3.2] 从默认值中提取
+                    $json->$key = $rule['default'];
+                }
+                continue;
             }
-            // [2.5] 按类型与规则检查
+            // [2.4] 按类型与规则检查
             switch (strtolower($rule['type'])) {
                 case 'date' :
                     static::checkDate($json, $rule, $key);
