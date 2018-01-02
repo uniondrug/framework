@@ -40,10 +40,11 @@ interface SingleChildInterface
      *
      * @param string $parentName 上级字段名称
      * @param int    $parentValue 上级字段值
+     * @param string $columns 获取需要的字段 默认为*
      *
      * @return ResultsetInterface
      */
-    public function fetchChildren($parentName, $parentValue);
+    public function fetchChildren($parentName, $parentValue, $columns = "*");
 
     /**
      * 读取结构树

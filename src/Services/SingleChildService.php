@@ -25,21 +25,21 @@ abstract class SingleChildService extends SingleService implements SingleChildIn
     /**
      * @inheritdoc
      */
-    public function fetchChildren($parentName, $parentValue)
+    public function fetchChildren($parentName, $parentValue, $columns = "*")
     {
-        return $this->fetchAllByColumn($parentName, $parentValue);
+        return $this->fetchAllByColumn($parentName, $parentValue, $columns);
     }
 
     /**
      * @inheritdoc
      */
-    public function fetchTree($parentName, $parentValue, $primaryColumn = 'id')
+    public function fetchTree($parentName, $parentValue, $primaryColumn = 'id', $columns = "*")
     {
         $tree = [];
-        $children = $this->fetchChildren($parentName, $parentValue);
+        $children = $this->fetchChildren($parentName, $parentValue, $columns);
         foreach ($children as $child) {
             $temp = $child->toArray();
-            $temp['children'] = $this->fetchTree($parentName, $temp[$primaryColumn]);
+            $temp['children'] = $this->fetchTree($parentName, $temp[$primaryColumn], $primaryColumn, $columns);
             $tree[] = $temp;
         }
         unset($children);

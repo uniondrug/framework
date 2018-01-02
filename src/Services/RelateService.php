@@ -20,9 +20,9 @@ abstract class RelateService extends FrameworkService implements RelateFetchInte
     /**
      * @inheritdoc
      */
-    public function fetchAllByColumn($relateName, $relateValue, $columnName, $columnValue)
+    public function fetchAllByColumn($relateName, $relateValue, $columnName, $columnValue, $columns = "*")
     {
-        $parameters = [];
+        $parameters['columns'] = $columns;
         if (is_array($columnValue)) {
             $parameters['conditions'] = "{$relateName} = '{$relateValue}' AND {$columnName} IN ('".implode("', '", $columnValue)."')";
         } else {
@@ -86,9 +86,9 @@ abstract class RelateService extends FrameworkService implements RelateFetchInte
         $columns[$relateName] = $relateValue;
         $model = $this->getModel();
         $done = $model->create($columns);
-        if ($done){
+        if ($done) {
             $key = $this->getAutoIncrementColumn($model);
-            if ($key){
+            if ($key) {
                 return $this->$key;
             }
         }

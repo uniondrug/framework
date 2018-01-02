@@ -20,9 +20,9 @@ abstract class SingleService extends FrameworkService implements SingleFetchInte
     /**
      * @inheritdoc
      */
-    public function fetchAllByColumn($columnName, $columnValue)
+    public function fetchAllByColumn($columnName, $columnValue, $columns = "*")
     {
-        $parameters = [];
+        $parameters['columns'] = $columns;
         if (is_array($columnValue)) {
             $parameters['conditions'] = "{$columnName} IN ('".implode("', '", $columnValue)."')";
         } else {
@@ -58,7 +58,7 @@ abstract class SingleService extends FrameworkService implements SingleFetchInte
     {
         $count = 0;
         $fetch = $this->fetchAllByColumn($columnName, $columnValue);
-        foreach ($fetch as $model){
+        foreach ($fetch as $model) {
             $count += $model->delete() ? 1 : true;
         }
         return $count;
@@ -79,9 +79,9 @@ abstract class SingleService extends FrameworkService implements SingleFetchInte
     {
         $model = $this->getModel();
         $done = $model->create($columns);
-        if ($done){
+        if ($done) {
             $key = $this->getAutoIncrementColumn($model);
-            if ($key){
+            if ($key) {
                 return $this->$key;
             }
         }

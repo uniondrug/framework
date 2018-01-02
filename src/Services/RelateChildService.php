@@ -25,21 +25,21 @@ abstract class RelateChildService extends RelateService implements RelateChildIn
     /**
      * @inheritdoc
      */
-    public function fetchChildren($relateName, $relateValue, $parentName, $parentValue)
+    public function fetchChildren($relateName, $relateValue, $parentName, $parentValue, $columns = "*")
     {
-        return $this->fetchAllByColumn($relateName, $relateValue, $parentName, $parentValue);
+        return $this->fetchAllByColumn($relateName, $relateValue, $parentName, $parentValue, $columns);
     }
 
     /**
      * @inheritdoc
      */
-    public function fetchTree($relateName, $relateValue, $parentName, $parentValue, $primaryColumn = 'id')
+    public function fetchTree($relateName, $relateValue, $parentName, $parentValue, $primaryColumn = 'id', $columns = "*")
     {
         $tree = [];
-        $children = $this->fetchChildren($relateName, $relateValue, $parentName, $parentValue);
+        $children = $this->fetchChildren($relateName, $relateValue, $parentName, $parentValue, $columns);
         foreach ($children as $child) {
             $temp = $child->toArray();
-            $temp['children'] = $this->fetchTree($relateName, $relateValue, $parentName, $temp[$primaryColumn]);
+            $temp['children'] = $this->fetchTree($relateName, $relateValue, $parentName, $temp[$primaryColumn], $primaryColumn, $columns);
             $tree[] = $temp;
         }
         unset($children);
