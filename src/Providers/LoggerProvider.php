@@ -26,7 +26,7 @@ class LoggerProvider implements ServiceProviderInterface
                     $logFile = $logPath . $date . '.log';
                 }
                 if (!@file_exists($logPath)) {
-                    @mkdir($logPath, 0755);
+                    @mkdir($logPath, 0755, true);
                 }
                 return new FileLogger($logFile);
             }
