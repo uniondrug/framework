@@ -19,6 +19,9 @@
       "Pails\\": "src/"
     }
   },
+  "suggests": {
+    "dragonmantank/cron-expression": "Required by cron expression validator"
+  },
   "config": {
     "sort-packages": true
   },
