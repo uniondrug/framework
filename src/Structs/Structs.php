@@ -81,7 +81,13 @@ abstract class Structs extends \stdClass
      */
     public function toArray()
     {
-        return json_decode($this->toJson(), true);
+        $tmp = $this->_properties;
+        foreach ($tmp as & $value){
+            if ($value instanceof Structs) {
+                $value = $value->toArray();
+            }
+        }
+        return $tmp;
     }
 
     /**
@@ -90,6 +96,6 @@ abstract class Structs extends \stdClass
      */
     public function toJson()
     {
-        return json_encode($this->_properties, true);
+        return json_encode($this->toArray(), true);
     }
 }
