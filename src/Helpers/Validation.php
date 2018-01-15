@@ -29,12 +29,18 @@ class Validation extends PhalconValidation
 {
     /**
      * 参数(字段)的记数器
-     * 1. 指定参数使用了几种规则['validators' => 0]
+     * 1. 指定参数使用了几种规则['validators' => 3]
      * 2. 指定的规则中验证失败的有几个['failures' => 2]
-     * 3. 当 validators < failures 时即认为该参数能过验证
+     * 3. 当 validators == failures 时为未能过验证
+     * [如下例]
+     * 电话号码参数: 可以填写手机号或固定电话, 任意一项通过即正确。
      * @var array
      */
-    private $statistics = [];
+    private $stats = [];
+    /**
+     * @var 待合并的数据
+     */
+    private $mergeData;
 
     /**
      * 添加验证规则
@@ -49,13 +55,13 @@ class Validation extends PhalconValidation
         /**
          * 同步计数器
          */
-        if (!isset($this->statistics[$field])) {
-            $this->statistics[$field] = [
+        if (!isset($this->stats[$field])) {
+            $this->stats[$field] = [
                 'validators' => 0,
-                'messages' => 0
+                'failures' => 0
             ];
         }
-        $this->statistics[$field]['validators'] += 1;
+        $this->stats[$field]['validators'] += 1;
         /**
          * 加入规则
          */
@@ -76,8 +82,8 @@ class Validation extends PhalconValidation
          */
         foreach ($messages as $message) {
             $field = $message->getField();
-            if (isset($this->statistics[$field])) {
-                $this->statistics[$field]['messages'] += 1;
+            if (isset($this->stats[$field])) {
+                $this->stats[$field]['failures'] += 1;
             }
         }
     }
@@ -94,6 +100,22 @@ class Validation extends PhalconValidation
     public function beforeValidation($data, $entity, $messages)
     {
         return true;
+    }
+
+    /**
+     * 合并默认数据, 符合如下条件
+     * 1. 指定的参数未传递
+     * 2. 配置项中已为此字段指定了默认值
+     *
+     * @param string $key 字段名
+     * @param mixed  $value 字段值
+     */
+    public function mergeDefault($key, $value)
+    {
+        if ($this->mergeData === null){
+            $this->mergeData = new \stdClass();
+        }
+        $this->mergeData->$key = $value;
     }
 
     /**

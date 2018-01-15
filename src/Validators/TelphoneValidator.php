@@ -6,16 +6,21 @@
  */
 namespace Pails\Validators;
 
+use Pails\Helpers\Validation;
 use Phalcon\Validation\Message;
-use Phalcon\Validation\Validator;
 
 /**
  * 验证电话号码
+ * <code>
+ * new TimeValidator([
+ *     'min' => '08:00',
+ *     'max' => '21:30'
+ * ])
+ * </code>
  * @package Pails\Validators
  */
 class TelphoneValidator extends Validator
 {
-
     /**
      * 固定电话的规则
      * 1. 特殊1号: 95588、10000、10086
@@ -36,22 +41,25 @@ class TelphoneValidator extends Validator
     /**
      * 执行验证
      *
-     * @param \Phalcon\Validation $validation Validation对象
-     * @param string              $attribute 待验证的字段/参数名
+     * @param Validation $validation Validation对象
+     * @param string     $attribute 待验证的字段/参数名
      *
      * @return bool
      */
     public function validate(\Phalcon\Validation $validation, $attribute)
     {
-        foreach (self::$regexps as $regexp){
-            if (preg_match($regexp, $validation->getValue($attribute)) > 0){
+        // 1. 必须和非空验证
+        if (!$this->validateRequired($validation, $attribute) || !$this->validateEmpty($validation, $attribute)) {
+            return false;
+        }
+        // 2. 格式检查
+        foreach (self::$regexps as $regexp) {
+            if (preg_match($regexp, $validation->getValue($attribute)) > 0) {
                 return true;
             }
         }
-        $validation->appendMessage(new Message(
-            "参数'{$attribute}'不是有效的电话号码",
-            $attribute
-        ));
+        // 3. 格式有错误
+        $validation->appendMessage(new Message("参数'{$attribute}'的值不是有效的电话号码", $attribute));
         return false;
     }
 }

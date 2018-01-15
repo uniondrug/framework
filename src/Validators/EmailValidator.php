@@ -10,23 +10,20 @@ use Pails\Helpers\Validation;
 use Phalcon\Validation\Message;
 
 /**
- * 验证手机号
+ * 验证邮箱地址
  * <code>
  * $validation = new Validation();                  // 创建Validation实例
  * $attribute = 'field';                            // 参数名称
- * $options = [                                     // 验证选项
- *     'min' => '08:00',                            // 最小时间
- *     'max' => '21:30'                             // 最大时间
- * ];
- * $validator = new MobileValidator($options);
+ * $options = [];
+ * $validator = new EmailValidator($options);
  * $validation->add($attribute, $validator);
  * $validation->validate();
  * </code>
  * @package Pails\Validators
  */
-class MobileValidator extends Validator
+class EmailValidator extends Validator
 {
-    private static $regexp = "/^1[3-9][0-9]{9}$/";
+    private static $regexp = "/^[_a-z0-9][_a-z0-9\-\.]*[a-z0-9]@[a-z0-9][a-z0-9\.\-]*\.[a-z]{2,4}+$/i";
 
     /**
      * 执行验证
@@ -47,8 +44,8 @@ class MobileValidator extends Validator
         if (preg_match(self::$regexp, $value) > 0) {
             return true;
         }
-        // 3. 格式有错误
-        $validation->appendMessage(new Message("参数'{$attribute}'的值不是有效的手机号", $attribute));
+        // 3. 格式有错
+        $validation->appendMessage(new Message("参数'{$attribute}'的值不是有效的邮箱地址", $attribute));
         return false;
     }
 }
