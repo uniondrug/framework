@@ -7,6 +7,7 @@
 namespace Pails\Controllers;
 
 use Phalcon\Mvc\Controller;
+use UniondrugServiceClient\Client;
 use UniondrugServiceServer\Server;
 
 /**
@@ -16,6 +17,10 @@ use UniondrugServiceServer\Server;
  */
 abstract class ServiceServerController extends Controller
 {
+    /**
+     * @var Client
+     */
+    public $serviceClient;
     /**
      * @var Server
      */
@@ -28,6 +33,7 @@ abstract class ServiceServerController extends Controller
      */
     public function onConstruct()
     {
+        $this->serviceClient = new Client();
         $this->serviceServer = new Server();
     }
 
