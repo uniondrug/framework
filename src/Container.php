@@ -22,17 +22,10 @@ use Phalcon\Text;
  */
 final class Container extends Di
 {
-
     /**
      * 版本号
      */
     const VERSION = '1.0.0';
-
-    /**
-     * 当前环境
-     * @var null
-     */
-    private $env = null;
 
     /**
      * 应用路径
@@ -98,10 +91,7 @@ final class Container extends Di
      */
     public function environment()
     {
-        // 1. 优先用属性配置
-        if ($this->env) {
-            return $this->env;
-        }
+        // 1. 废弃，每次尝试从环境变量读取
 
         // 2. 读环境变量
         $default = 'development';
@@ -114,8 +104,7 @@ final class Container extends Di
         $value || $value = $default;
 
         // 4. 同步属性并返回
-        $this->env = strtolower($value);
-        return $this->env;
+        return strtolower($value);
     }
 
     /**
@@ -124,7 +113,7 @@ final class Container extends Di
      */
     public function isDevelopment()
     {
-        return $this->env === "development";
+        return $this->environment() === "development";
     }
 
     /**
@@ -133,7 +122,7 @@ final class Container extends Di
      */
     public function isProduction()
     {
-        return $this->env === "production";
+        return $this->environment() === "production";
     }
 
     /**
@@ -142,7 +131,7 @@ final class Container extends Di
      */
     public function isTesting()
     {
-        return $this->env === "testing";
+        return $this->environment() === "testing";
     }
 
     /**
