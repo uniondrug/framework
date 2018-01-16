@@ -14,12 +14,17 @@ applicationDir=$(pwd)
 # 2. add '.gitkeep' file
 frameworkFolders="app \
     app/Controllers \
+    app/Controllers/Abstracts \
     app/Models \
-    app/Services\
+    app/Models/Abstracts \
+    app/Requests \
+    app/Services \
+    app/Services/Abstracts \
+    app/Structs \
     config \
     docs \
-    log\
-    public\
+    log \
+    public \
     tmp"
 for name in ${frameworkFolders} ; do
     mkdir -p ${applicationDir}/${name}
