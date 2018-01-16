@@ -1,7 +1,11 @@
 <?php
 /**
- * Crontab.php
+ * 验证一个表达式是否是一个规范的Crontab格式。
  *
+ * 需要composer require dragonmantank/cron-expression
+ *
+ * @author XueronNi <xueronni@uniondrug.cn>
+ * @date   2018-01-01
  */
 
 namespace Pails\Validators;
@@ -10,8 +14,14 @@ use Cron\CronExpression;
 use Phalcon\Validation;
 use Phalcon\Validation\Validator;
 
-class Crontab extends Validator
+class CrontabValidator extends Validator
 {
+    /**
+     * @param \Phalcon\Validation $validation
+     * @param                     $field
+     *
+     * @return bool
+     */
     public function validate(Validation $validation, $field)
     {
         $value = $validation->getValue($field);
