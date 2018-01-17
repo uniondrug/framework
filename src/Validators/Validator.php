@@ -6,8 +6,8 @@
  */
 namespace Pails\Validators;
 
-use Pails\Helpers\Validation;
 use Phalcon\Filter;
+use Phalcon\Validation;
 use Phalcon\Validation\Message;
 use Phalcon\Validation\Validator as PhalconValidator;
 
@@ -46,7 +46,7 @@ abstract class Validator extends PhalconValidator
         if ($this->getOption('empty') === true) {
             return true;
         }
-        // 3.
+        // 3. 不允许为空
         $validation->appendMessage(new Message("参数'{$attribute}'的值不能为空", $attribute));
         return false;
     }
@@ -66,11 +66,7 @@ abstract class Validator extends PhalconValidator
             return true;
         }
         // 2. 限制必须传递时
-
-        var_dump('required: ', $this->getOption('required'));
-
         if ($this->getOption('required') === true) {
-            echo __METHOD__."->Required\r\n";
             $validation->appendMessage(new Message("参数'{$attribute}'未传递", $attribute));
             return false;
         }
@@ -81,7 +77,4 @@ abstract class Validator extends PhalconValidator
         }
         return true;
     }
-
-
-
 }

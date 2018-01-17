@@ -6,29 +6,29 @@
  */
 namespace Pails\Validators;
 
-use Pails\Structs\TimeParseStruct;
-use Phalcon\Validation;
+use Pails\Helpers\Validation;
+use Pails\Structs\DateParseStruct;
 use Phalcon\Validation\Message;
 
 /**
- * 验证时间格式
+ * 验证日期格式
  * <code>
  * $validation = new Validation();                  // 创建Validation实例
  * $attribute = 'field';                            // 参数名称
  * $options = [                                     // 验证选项
  *     'required' => 'true',                        // 是否必须
  *     'empty' => 'false',                          // 是否允许为空
- *     'default' => '08:00',                        // 当不传字段时赋默认值
- *     'min' => '08:00',                            // 最小时间
- *     'max' => '21:30'                             // 最大时间
+ *     'default' => '2018-01-15',                   // 当不传字段时赋默认值
+ *     'min' => '2018-01-01',                       // 最小日期
+ *     'max' => '2018-12-31'                        // 最大日期
  * ];
- * $validator = new TimeValidator($options);
+ * $validator = new DateValidator($options);
  * $validation->add($attribute, $validator);
  * $validation->validate();
  * </code>
  * @package Pails\Validators
  */
-class TimeValidator extends Validator
+class DateValidator extends Validator
 {
     /**
      * 执行验证
@@ -50,31 +50,31 @@ class TimeValidator extends Validator
         if ($value === '') {
             return true;
         }
-        // 4. 时间格式检查
-        $parsed = new TimeParseStruct($value);
+        // 4. 日期格式检查
+        $parsed = new DateParseStruct($value);
         if (!$parsed->parsed) {
-            $validation->appendMessage(new Message("参数'{$attribute}'的值不是有效的时间", $attribute));
+            $validation->appendMessage(new Message("参数'{$attribute}'的值不是有效的日期", $attribute));
             return false;
         }
         // 5. 最小值
         $minValue = $this->getOption('min');
         if ($minValue != null) {
-            $minParsed = new TimeParseStruct($minValue);
+            $minParsed = new DateParseStruct($minValue);
             if ($minParsed->parsed && $parsed->number < $minParsed->number) {
                 $validation->appendMessage(new Message("参数'{$attribute}'的值不能小于'{$minValue}'", $attribute));
                 return false;
             }
         }
-        // 6. 最大时间
+        // 6. 最大日期
         $maxValue = $this->getOption('max');
         if ($maxValue != null) {
-            $maxParsed = new TimeParseStruct($maxValue);
+            $maxParsed = new DateParseStruct($maxValue);
             if ($maxParsed->parsed && $parsed->number > $maxParsed->number) {
                 $validation->appendMessage(new Message("参数'{$attribute}'的值不能大于'{$maxValue}'", $attribute));
                 return false;
             }
         }
-        // 7. 时间正确
+        // 7. 日期正确
         return true;
     }
 }

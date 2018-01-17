@@ -14,10 +14,7 @@ use Phalcon\Validation\Message;
  * <code>
  * $validation = new Validation();                  // 创建Validation实例
  * $attribute = 'field';                            // 参数名称
- * $options = [                                     // 验证选项
- *     'min' => '08:00',                            // 最小时间
- *     'max' => '21:30'                             // 最大时间
- * ];
+ * $options = [];                                   // 验证选项
  * $validator = new MobileValidator($options);
  * $validation->add($attribute, $validator);
  * $validation->validate();
@@ -44,6 +41,11 @@ class MobileValidator extends Validator
         }
         // 2. 格式检查
         $value = $validation->getValue($attribute);
+        // 3. 允许为空(当禁止为空时已由validateEmpty()过滤)
+        if ($value === '') {
+            return true;
+        }
+        // 4. 格式检查
         if (preg_match(self::$regexp, $value) > 0) {
             return true;
         }

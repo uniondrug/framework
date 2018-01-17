@@ -41,10 +41,15 @@ class EmailValidator extends Validator
         }
         // 2. 格式检查
         $value = $validation->getValue($attribute);
+        // 3. 允许为空(当禁止为空时已由validateEmpty()过滤)
+        if ($value === '') {
+            return true;
+        }
+        // 4. 格式检查
         if (preg_match(self::$regexp, $value) > 0) {
             return true;
         }
-        // 3. 格式有错
+        // 5. 格式有错
         $validation->appendMessage(new Message("参数'{$attribute}'的值不是有效的邮箱地址", $attribute));
         return false;
     }

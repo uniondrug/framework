@@ -12,10 +12,12 @@ use Phalcon\Validation\Message;
 /**
  * 验证电话号码
  * <code>
- * new TimeValidator([
- *     'min' => '08:00',
- *     'max' => '21:30'
- * ])
+ * $validation = new Validation();                  // 创建Validation实例
+ * $attribute = 'field';                            // 参数名称
+ * $options = [];
+ * $validator = new TelphoneValidator($options);
+ * $validation->add($attribute, $validator);
+ * $validation->validate();
  * </code>
  * @package Pails\Validators
  */
@@ -53,12 +55,18 @@ class TelphoneValidator extends Validator
             return false;
         }
         // 2. 格式检查
+        $value = $validation->getValue($attribute);
+        // 3. 允许为空(当禁止为空时已由validateEmpty()过滤)
+        if ($value === '') {
+            return true;
+        }
+        // 4. 格式检查
         foreach (self::$regexps as $regexp) {
-            if (preg_match($regexp, $validation->getValue($attribute)) > 0) {
+            if (preg_match($regexp, $value) > 0) {
                 return true;
             }
         }
-        // 3. 格式有错误
+        // 5. 格式有错误
         $validation->appendMessage(new Message("参数'{$attribute}'的值不是有效的电话号码", $attribute));
         return false;
     }
