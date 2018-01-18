@@ -38,9 +38,9 @@ class Validation extends PhalconValidation
      */
     private $stats = [];
     /**
-     * @var object 待合并的数据组
+     * @var array 待合并的数据组
      */
-    private $mergeData;
+    private $mergeData = [];
 
     /**
      * 添加验证规则
@@ -103,6 +103,57 @@ class Validation extends PhalconValidation
     }
 
     /**
+     * 读取需合并的默认值
+     * @return array
+     */
+    public function getMergeDefault()
+    {
+        return $this->mergeData;
+    }
+
+    /**
+     * 读取错误原因
+     * @return string
+     */
+    public function getFailureMessage()
+    {
+        $attribute = null;
+        $message = null;
+        foreach ($this->stats as $key => $stat) {
+            if ($stat['validators'] === $stat['failures']) {
+                $attribute = $key;
+                break;
+            }
+        }
+
+        foreach ($this->getMessages() as $message){
+            if ($message->getField() === $attribute){
+                $message = $message->getMessage();
+                break;
+            }
+        }
+
+
+        return $message;
+    }
+
+    /**
+     * 是否有错误
+     * @return bool
+     */
+    public function hasFailure()
+    {
+        $has = false;
+        foreach ($this->stats as $stat) {
+            if ($stat['validators'] === $stat['failures']) {
+                $has = true;
+                break;
+            }
+        }
+        return $has;
+    }
+
+    /**
      * 合并默认数据, 符合如下条件
      * 1. 指定的参数未传递
      * 2. 配置项中已为此字段指定了默认值
@@ -112,10 +163,7 @@ class Validation extends PhalconValidation
      */
     public function mergeDefault($key, $value)
     {
-        if ($this->mergeData === null){
-            $this->mergeData = new \stdClass();
-        }
-        $this->mergeData->$key = $value;
+        $this->mergeData[$key] = $value;
     }
 
     /**
