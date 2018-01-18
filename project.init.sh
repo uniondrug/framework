@@ -33,15 +33,16 @@ done
 
 # make '.gitignore'
 gitIgnoreFile="${applicationDir}/.gitignore"
+
+# ignore
 if [ ! -e "${gitIgnoreFile}" ] ; then
-    echo '# git ignore configurations' > ${gitIgnoreFile}
+    echo '# ignore' > ${gitIgnoreFile}
     echo ".git/" >> ${gitIgnoreFile}
-    echo ".gitignore" >> ${gitIgnoreFile}
-    echo ".gitkeep" >> ${gitIgnoreFile}
-    echo "*.bak" >> ${gitIgnoreFile}
-    echo "*.log" >> ${gitIgnoreFile}
+    echo "local/" >> ${gitIgnoreFile}
     echo "vendor/" >> ${gitIgnoreFile}
     echo "composer.lock" >> ${gitIgnoreFile}
+    echo "*.bak" >> ${gitIgnoreFile}
+    echo "*.log" >> ${gitIgnoreFile}
 fi
 
 # create `public/index.php`
