@@ -14,7 +14,6 @@ use Pails\Providers\LoggerProvider;
 use Pails\Providers\RouterProvider;
 use Phalcon\Di;
 use Phalcon\Di\Service;
-use Phalcon\Http\Response;
 use Phalcon\Text;
 
 /**
@@ -27,7 +26,7 @@ final class Container extends Di
     /**
      * 版本号
      */
-    const VERSION = '1.0.0';
+    const VERSION = '1.14.0';
 
     /**
      * 应用路径
@@ -96,19 +95,18 @@ final class Container extends Di
      */
     public function environment()
     {
-        // 1. 废弃，每次尝试从环境变量读取
-
-        // 2. 读环境变量
         $default = 'development';
+
+        // 1. 读环境变量
         $value = getenv('APP_ENV');
         if ($value && Text::startsWith($value, '"') && Text::endsWith($value, '"')) {
             $value = substr($value, 1, -1);
         }
 
-        // 3. 使用默认
+        // 2. 使用默认
         $value || $value = $default;
 
-        // 4. 同步属性并返回
+        // 3. 同步属性并返回
         return strtolower($value);
     }
 
@@ -163,30 +161,41 @@ final class Container extends Di
     {
         try {
             $application = $this->getShared($applicationClassName);
-            $return = $application->boot()->handle();
-            if ($return instanceof Response) {
-                $return->send();
-            } else {
-                $this->getShared('response')->setJsonContent([])->send();
-            }
-        } catch (\Exception $e) {
-            $this->getLogger('error')->error("System Error: " . $e->getMessage() . ". \nTrace: \n" . $e->getTraceAsString());
-
-            if ($this->getConfig()->path('app.debug', false)) {
-                /**
-                 * 开启Debug模式，交给PhalconDebugger捕获
-                 */
-                throw $e;
-            } else {
-                /**
-                 * 非Debug模式，直接输出一个Json
-                 */
-                $this->getShared('response')->setJsonContent([
-                    'errno' => "-1",
-                    'error' => "System Error: " . $e->getMessage(),
-                ])->send();
-            }
+            $response = $application->boot()->handle();
+        } catch (\Throwable $e) {
+            $response = $this->handleException($e);
+        } finally {
+            $response->send();
         }
+    }
+
+    /**
+     * @param \Exception|\Throwable|\Error $e
+     *
+     * @return \Phalcon\Http\Response
+     */
+    public function handleException($e)
+    {
+        // Log
+        $logContext = [
+            'error' => $e->getMessage(),
+            'errno' => $e->getCode(),
+            'file'  => $e->getFile(),
+            'line'  => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ];
+        $this->getLogger("framework")->error("{error} ({errno}) in {file}:{line}\nStack trace:\n{trace}", $logContext);
+
+        // Res
+        $res = call_user_func($this->getConfig()->path('exception.response'), $e);
+
+        // 普通异常作为应用报错，状态码200正常；Error级别的错误作为框架容器等底层报错，状态码设置为500
+        if ($e instanceof \Error) {
+            $statusCode = 500;
+        } else {
+            $statusCode = 200;
+        }
+        return $this->getShared('response')->setJsonContent($res)->setStatusCode($statusCode);
     }
 
     /**
