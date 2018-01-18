@@ -38,7 +38,7 @@ class Validation extends PhalconValidation
      */
     private $stats = [];
     /**
-     * @var 待合并的数据
+     * @var object 待合并的数据组
      */
     private $mergeData;
 
