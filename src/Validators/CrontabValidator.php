@@ -29,7 +29,7 @@ class CrontabValidator extends Validator
             $label = $this->prepareLabel($validation, $field);
             $message = $this->prepareMessage($validation, $field, 'Crontab');
             $code = $this->prepareCode($field);
-            $replace = [':field', $label];
+            $replace = [':field' => $label];
             $validation->appendMessage(
                 new Validation\Message(strtr($message, $replace), $field, 'Crontab', $code)
             );
