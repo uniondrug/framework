@@ -5,8 +5,9 @@
  */
 namespace Pails\Providers;
 
+use Pails\Logger;
 use Phalcon\Di\ServiceProviderInterface;
-use Phalcon\Logger\Adapter\File as FileLogger;
+use Phalcon\Logger\Adapter\File;
 
 class LoggerProvider implements ServiceProviderInterface
 {
@@ -28,7 +29,10 @@ class LoggerProvider implements ServiceProviderInterface
                 if (!@file_exists($logPath)) {
                     @mkdir($logPath, 0755, true);
                 }
-                return new FileLogger($logFile);
+                //return new File($logFile);
+
+                $logger = new Logger($logFile);
+                return $logger->setLastDate($date)->setLogCategory($logCategory);
             }
         );
     }
