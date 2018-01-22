@@ -17,7 +17,7 @@ class RouterProvider implements ServiceProviderInterface
         $di->setShared(
             'router',
             function () {
-                if ($this->getConfig()->path('app.userAnnotationRouter', false)) {
+                if ($this->getConfig()->path('app.useAnnotationRouter', false)) {
                     // 启用注解路由，此时默认路由关闭
                     $router = new \Pails\Router(false);
                     $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->appPath() . '/Controllers'), \RecursiveIteratorIterator::SELF_FIRST);
