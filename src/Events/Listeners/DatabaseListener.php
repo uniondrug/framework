@@ -44,7 +44,6 @@ class DatabaseListener extends Injectable
      */
     public function afterQuery(Event $event, $connection)
     {
-        echo "aaa\n";
         $this->profiler->stopProfile();
 
         $profile = $this->profiler->getLastProfile();
