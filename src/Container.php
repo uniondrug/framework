@@ -21,12 +21,12 @@ use Phalcon\Text;
  *
  * @package Pails
  */
-final class Container extends Di
+class Container extends Di
 {
     /**
      * 版本号
      */
-    const VERSION = '1.14.0';
+    const VERSION = '1.16.0';
 
     /**
      * 应用路径
