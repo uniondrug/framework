@@ -15,17 +15,13 @@ class DatabaseProvider implements ServiceProviderInterface
                 $config = $this->getConfig()->path('database');
                 if ($config) {
                     $db = new Mysql($config->connection->toArray());
+                    $db->setEventsManager($this->getEventsManager());
                     return $db;
                 } else {
                     throw new \RuntimeException('No database config found. please check config file exists or APP_ENV is configed');
                 }
             }
         );
-
-        // 打开数据库调试日志
-        if ($di->getConfig()->path('database.debug', false)) {
-            $di->getEventsManager()->attach('db', new DatabaseListener());
-        }
 
         /**
          * set readonly connection
@@ -37,12 +33,18 @@ class DatabaseProvider implements ServiceProviderInterface
                     $config = $this->getConfig()->get('database');
                     if ($config) {
                         $db = new Mysql($config->slaveConnection->toArray());
+                        $db->setEventsManager($this->getEventsManager());
                         return $db;
                     } else {
                         throw new \RuntimeException('No readonly database config found. please check config file exists or APP_ENV is configed');
                     }
                 }
             );
+        }
+
+        // 打开数据库调试日志
+        if ($di->getConfig()->path('database.debug', false)) {
+            $di->getEventsManager()->attach('db', new DatabaseListener());
         }
     }
 }
