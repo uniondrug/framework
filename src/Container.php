@@ -275,7 +275,7 @@ class Container extends Di
      *
      * @return bool
      */
-    public function hasSharedInstances($name)
+    public function hasSharedInstance($name)
     {
         return isset($this->_sharedInstances[$name]);
     }
@@ -284,7 +284,7 @@ class Container extends Di
      * @param $name
      *
      */
-    public function removeSharedInstances($name)
+    public function removeSharedInstance($name)
     {
         unset($this->_sharedInstances[$name]);
     }
