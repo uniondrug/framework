@@ -17,9 +17,25 @@ use Phalcon\Di\Service;
 use Phalcon\Text;
 
 /**
- * Class Container
- *
- * @package Pails
+ * @method \Phalcon\Annotations\AdapterInterface getAnnotation()
+ * @method \Phalcon\Mvc\DispatcherInterface getDispatcher()
+ * @method \Phalcon\Mvc\Url|\Phalcon\Mvc\UrlInterface getUrl()
+ * @method \Phalcon\Mvc\Model\Manager|\Phalcon\Mvc\Model\ManagerInterface getModelsManager()
+ * @method \Phalcon\Mvc\Model\MetaData\Memory|\Phalcon\Mvc\Model\MetadataInterface getModelsMetadata()
+ * @method \Phalcon\Http\Response|\Phalcon\Http\ResponseInterface getResponse()
+ * @method \Phalcon\Http\Request|\Phalcon\Http\RequestInterface getRequest()
+ * @method \Phalcon\Filter|\Phalcon\FilterInterface getFilter()
+ * @method \Phalcon\Crypt|\Phalcon\CryptInterface getEscaper()
+ * @method \Phalcon\Security getSecurity()
+ * @method \Phalcon\Db\AdapterInterface getDb()
+ * @method \Phalcon\Db\AdapterInterface getDbSlave()
+ * @method \Phalcon\Crypt|\Phalcon\CryptInterface getCrypt()
+ * @method \Phalcon\Mvc\Model\Transaction\Manager|\Phalcon\Mvc\Model\Transaction\ManagerInterface
+ *         getTransactionManager()
+ * @method \Phalcon\Mvc\Router|\Phalcon\Mvc\RouterInterface getRouter()
+ * @method \Phalcon\Logger\AdapterInterface getLogger(string $name = null)
+ * @method \Phalcon\Config getConfig()
+ * @method \UniondrugMiddleware\MiddlewareManager getMiddlewareManager()
  */
 class Container extends Di
 {
@@ -195,6 +211,7 @@ class Container extends Di
         } else {
             $statusCode = 200;
         }
+
         return $this->getShared('response')->setJsonContent($res)->setStatusCode($statusCode);
     }
 
@@ -251,5 +268,24 @@ class Container extends Di
     public function tmpPath()
     {
         return $this->baseDir . DIRECTORY_SEPARATOR . 'tmp';
+    }
+
+    /**
+     * @param $name
+     *
+     * @return bool
+     */
+    public function hasSharedInstances($name)
+    {
+        return isset($this->_sharedInstances[$name]);
+    }
+
+    /**
+     * @param $name
+     *
+     */
+    public function removeSharedInstances($name)
+    {
+        unset($this->_sharedInstances[$name]);
     }
 }
