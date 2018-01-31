@@ -64,6 +64,11 @@ abstract class ServiceServerController extends Controller
     {
         $rawBody = $this->getJsonRawBody();
         if (isset($rawBody->topicMessageBody) && isset($rawBody->topicMessageId)) {
+            // 1. 已转成stdClass
+            if ($rawBody->topicMessageBody instanceof \stdClass){
+                return $rawBody->topicMessageBody;
+            }
+            // 2. JSON字符串转stdClass
             $body = json_decode($rawBody, false);
             if (JSON_ERROR_NONE === json_last_error()) {
                 return $body;
