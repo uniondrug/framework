@@ -80,19 +80,19 @@ class Param extends \stdClass
             }
             // 1.3 加入验证
             $type = strtolower($rule['type']);
-            if (isset(static::$validatorConfig[$type])){
+            if (isset(static::$validatorConfig[$type])) {
                 $validation->add($key, new static::$validatorConfig[$type]($rule));
             }
         }
         // 2. 批量验证
         $validation->validate($json);
         // 3. 验证过程有错误
-        if ($validation->hasFailure()){
+        if ($validation->hasFailure()) {
             throw new ParamException($validation->getFailureMessage());
         }
         // 4. 数据合并
         $merge = $validation->getMergeDefault();
-        foreach ($merge as $key => $value){
+        foreach ($merge as $key => $value) {
             $json->$key = $value;
         }
     }

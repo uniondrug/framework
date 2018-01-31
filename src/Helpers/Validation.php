@@ -125,15 +125,12 @@ class Validation extends PhalconValidation
                 break;
             }
         }
-
-        foreach ($this->getMessages() as $message){
-            if ($message->getField() === $attribute){
+        foreach ($this->getMessages() as $message) {
+            if ($message->getField() === $attribute) {
                 $message = $message->getMessage();
                 break;
             }
         }
-
-
         return $message;
     }
 

@@ -55,4 +55,21 @@ abstract class ServiceServerController extends Controller
         }
         return $this->serviceJsonRawBody;
     }
+
+    /**
+     * 从Payload中过滤MQ消息
+     * @return \stdClass
+     */
+    public function getPayloadBody()
+    {
+        $rawBody = $this->getJsonRawBody();
+        if (isset($rawBody->topicMessageBody) && isset($rawBody->topicMessageId)) {
+            $body = json_decode($rawBody, false);
+            if (JSON_ERROR_NONE === json_last_error()) {
+                return $body;
+            }
+            return new \stdClass();
+        }
+        return $rawBody;
+    }
 }
