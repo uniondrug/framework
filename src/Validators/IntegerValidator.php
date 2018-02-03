@@ -28,7 +28,7 @@ use Phalcon\Validation\Message;
  */
 class IntegerValidator extends Validator
 {
-    private static $regexp = "/^[\+|\-]*[0-9]$/";
+    private static $regexp = "/^[\+|\-]*[0-9]+$/";
 
     /**
      * 执行验证
