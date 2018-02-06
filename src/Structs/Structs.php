@@ -91,9 +91,9 @@ abstract class Structs extends \stdClass
             $type = isset($conf['type']) ? strtolower($conf['type']) : null;
             $field = isset($conf['field']) ? $conf['field'] : $key;
             // 2. 已传参
-            if (isset($data->$field)) {
+            if (isset($data->$key)) {
                 // 3. 类型与值
-                $value = (string) $data->$field;
+                $value = (string) $data->$key;
                 // 4. 类型转换
                 if ($type !== null) {
                     switch ($type) {
