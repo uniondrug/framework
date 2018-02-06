@@ -121,7 +121,7 @@ abstract class Structs extends \stdClass
             }
             // 2. 未传参
             $value = isset($conf['default']) ? $conf['default'] : null;
-            if ($type !== null) {
+            if ($type !== null && $value === null) {
                 switch ($type) {
                     // int
                     case 'int' :
