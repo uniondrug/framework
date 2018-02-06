@@ -20,6 +20,15 @@ class Router extends Annotations
     protected $_parsed = false;
 
     /**
+     * 重置Parsed属性
+     * @param bool $parsed
+     */
+    public function setParsed($parsed = false)
+    {
+        $this->_parsed = $parsed;
+    }
+
+    /**
      * 彻底禁止prefix功能
      *
      * @inheritdoc
