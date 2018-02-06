@@ -67,6 +67,84 @@ abstract class Structs extends \stdClass
     }
 
     /**
+     * 从$data数据源中提取数据, 并转为结构体默认选项
+     * <code>
+     * $defaults = [
+     *     'drugId' => [
+     *         'type' => 'int',
+     *         'field' => 'id'
+     *     ]
+     * ];
+     * </code>
+     *
+     * @param array     $defaults 默认项
+     * @param \stdClass $data 数据源
+     *
+     * @return array
+     */
+    public static function initOptions(& $defaults, & $data)
+    {
+        $options = [];
+        foreach ($defaults as $key => $conf) {
+            // 1. 数组级配置
+            $conf = is_array($conf) ? $conf : [];
+            $type = isset($conf['type']) ? strtolower($conf['type']) : null;
+            $field = isset($conf['field']) ? $conf['field'] : $key;
+            // 2. 已传参
+            if (isset($data->$key)) {
+                // 3. 类型与值
+                $value = (string) $data->$key;
+                // 4. 类型转换
+                if ($type !== null) {
+                    switch ($type) {
+                        // int
+                        case 'int' :
+                        case 'integer' :
+                            $value = preg_match("/^[\-]?[0-9]+$/", $value) > 0 ? (int) $value : 0;
+                            break;
+                        // double
+                        case 'float' :
+                        case 'double' :
+                            $value = preg_match("/^[\-]?[0-9]*[\.]?[0-9]+$/", $value) > 0 ? (double) $value : 0.0;
+                            break;
+                        // string
+                        case 'string' :
+                            break;
+                        // null
+                        default :
+                            $value = null;
+                            break;
+                    }
+                }
+                $options[$field] = $value;
+                continue;
+            }
+            // 2. 未传参
+            $value = isset($conf['default']) ? $conf['default'] : null;
+            if ($type !== null && $value === null) {
+                switch ($type) {
+                    // int
+                    case 'int' :
+                    case 'integer' :
+                        $value = 0;
+                        break;
+                    // double
+                    case 'float' :
+                    case 'double' :
+                        $value = 0.0;
+                        break;
+                    // string
+                    case 'string' :
+                        $value = '';
+                        break;
+                }
+            }
+            $options[$field] = $value;
+        }
+        return $options;
+    }
+
+    /**
      * 重置结果集
      */
     public function reset()
@@ -81,13 +159,7 @@ abstract class Structs extends \stdClass
      */
     public function toArray()
     {
-        $tmp = $this->_properties;
-        foreach ($tmp as & $value){
-            if ($value instanceof Structs) {
-                $value = $value->toArray();
-            }
-        }
-        return $tmp;
+        return $this->toArrayParser($this->_properties);
     }
 
     /**
@@ -97,5 +169,23 @@ abstract class Structs extends \stdClass
     public function toJson()
     {
         return json_encode($this->toArray(), true);
+    }
+
+    /**
+     * 解析std/structs为数组
+     * @param array $data
+     *
+     * @return array
+     */
+    private function toArrayParser($data)
+    {
+        foreach ($data as $key => & $value) {
+            if (is_array($value)) {
+                $value = $this->toArrayParser($value);
+            } else if ($value instanceof Structs) {
+                $value = $value->toArray();
+            }
+        }
+        return $data;
     }
 }
