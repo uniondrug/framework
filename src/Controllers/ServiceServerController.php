@@ -7,6 +7,7 @@
 namespace Pails\Controllers;
 
 use Phalcon\Mvc\Controller;
+use UniondrugMq\MqRequest;
 use UniondrugServiceClient\Client;
 use UniondrugServiceServer\Server;
 
@@ -26,6 +27,10 @@ abstract class ServiceServerController extends Controller
      */
     public $serviceServer;
     private $serviceJsonRawBody;
+    /**
+     * @var MqRequest
+     */
+    public $mqRequest;
 
     /**
      * 构造
@@ -58,23 +63,18 @@ abstract class ServiceServerController extends Controller
 
     /**
      * 从Payload中过滤MQ消息
+     * 1. 来自MQ发起的请求, 即异步调用了API
+     * 2. 自来业务的过程请求, Restful API
      * @return \stdClass
      */
     public function getPayloadBody()
     {
-        $rawBody = $this->getJsonRawBody();
-        if (isset($rawBody->topicMessageBody) && isset($rawBody->topicMessageId)) {
-            // 1. 已转成stdClass
-            if ($rawBody->topicMessageBody instanceof \stdClass){
-                return $rawBody->topicMessageBody;
-            }
-            // 2. JSON字符串转stdClass
-            $body = json_decode($rawBody, false);
-            if (JSON_ERROR_NONE === json_last_error()) {
-                return $body;
-            }
-            return new \stdClass();
+        if ($this->mqRequest === null) {
+            $this->mqRequest = MqRequest::init();
         }
-        return $rawBody;
+        if ($this->mqRequest->is()) {
+            return $this->mqRequest->payload;
+        }
+        return $this->getJsonRawBody();
     }
 }
