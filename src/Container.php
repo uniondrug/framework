@@ -88,7 +88,7 @@ class Container extends Di
             "modelsManager"      => new Service("modelsManager", "Phalcon\\Mvc\\Model\\Manager", true),
             "modelsMetadata"     => new Service("modelsMetadata", "Phalcon\\Mvc\\Model\\MetaData\\Memory", true),
             "response"           => new Service("response", "Phalcon\\Http\\Response", true),
-            "request"            => new Service("request", "Phalcon\\Http\\Request", true),
+            "request"            => new Service("request", "Pails\\Request", true),
             "filter"             => new Service("filter", "Phalcon\\Filter", true),
             "escaper"            => new Service("escaper", "Phalcon\\Escaper", true),
             "security"           => new Service("security", "Phalcon\\Security", true),

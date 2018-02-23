@@ -9,7 +9,6 @@ namespace Pails\Events\Listeners;
 use Phalcon\Db\Profiler;
 use Phalcon\Di\Injectable;
 use Phalcon\Events\Event;
-use Phalcon\Logger;
 
 /**
  * Class DatabaseListener
