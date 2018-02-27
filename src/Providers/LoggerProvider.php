@@ -5,8 +5,8 @@
  */
 namespace Uniondrug\Framework\Providers;
 
-use Uniondrug\Framework\Logger;
 use Phalcon\Di\ServiceProviderInterface;
+use Uniondrug\Framework\Logger;
 
 class LoggerProvider implements ServiceProviderInterface
 {

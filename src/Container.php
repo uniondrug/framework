@@ -8,13 +8,13 @@
 
 namespace Uniondrug\Framework;
 
+use Phalcon\Di;
+use Phalcon\Di\Service;
+use Phalcon\Text;
 use Uniondrug\Framework\Providers\ConfigProvider;
 use Uniondrug\Framework\Providers\DatabaseProvider;
 use Uniondrug\Framework\Providers\LoggerProvider;
 use Uniondrug\Framework\Providers\RouterProvider;
-use Phalcon\Di;
-use Phalcon\Di\Service;
-use Phalcon\Text;
 
 /**
  * @method \Phalcon\Annotations\AdapterInterface getAnnotation()
