@@ -6,8 +6,8 @@
   "license": "MIT",
   "authors": [
     {
-      "name": "UnionDrug Dev",
-      "email": "xueronni@uniondrug.cn"
+      "name": "UnionDrug R&D",
+      "email": "dev@uniondrug.cn"
     }
   ],
   "require": {
@@ -16,11 +16,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Pails\\": "src/"
+      "Uniondrug\\Framework\\": "src/"
     }
-  },
-  "suggests": {
-    "dragonmantank/cron-expression": "Required by cron expression validator"
   },
   "config": {
     "sort-packages": true

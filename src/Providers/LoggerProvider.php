@@ -3,9 +3,9 @@
  * 日志服务注册
  *
  */
-namespace Pails\Providers;
+namespace Uniondrug\Framework\Providers;
 
-use Pails\Logger;
+use Uniondrug\Framework\Logger;
 use Phalcon\Di\ServiceProviderInterface;
 
 class LoggerProvider implements ServiceProviderInterface

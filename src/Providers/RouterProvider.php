@@ -4,7 +4,7 @@
  *
  */
 
-namespace Pails\Providers;
+namespace Uniondrug\Framework\Providers;
 
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\Mvc\Router;
@@ -19,7 +19,7 @@ class RouterProvider implements ServiceProviderInterface
             function () {
                 if ($this->getConfig()->path('app.useAnnotationRouter', false)) {
                     // 启用注解路由，此时默认路由关闭
-                    $router = new \Pails\Router(false);
+                    $router = new \Uniondrug\Framework\Router(false);
                     $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->appPath() . '/Controllers'), \RecursiveIteratorIterator::SELF_FIRST);
                     foreach ($iterator as $item) {
                         if (Text::endsWith($item, 'Controller.php', false)) {

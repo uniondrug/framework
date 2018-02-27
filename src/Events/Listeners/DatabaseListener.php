@@ -4,7 +4,7 @@
  *
  */
 
-namespace Pails\Events\Listeners;
+namespace Uniondrug\Framework\Events\Listeners;
 
 use Phalcon\Db\Profiler;
 use Phalcon\Di\Injectable;

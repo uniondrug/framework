@@ -3,11 +3,10 @@
  * 应用入口
  */
 
-namespace Pails;
+namespace Uniondrug\Framework;
 
 /**
  * Class Application
- * @package Pails
  */
 class Application extends \Phalcon\Mvc\Application
 {
@@ -21,6 +20,7 @@ class Application extends \Phalcon\Mvc\Application
         $providers === null || $this->di->registerServices($providers);
         // disable views
         $this->useImplicitView(false);
+
         return $this;
     }
 }

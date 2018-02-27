@@ -6,7 +6,7 @@
  * @date   2018-01-17
  */
 
-namespace Pails;
+namespace Uniondrug\Framework;
 
 use Phalcon\Mvc\Router\Annotations;
 

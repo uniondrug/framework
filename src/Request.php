@@ -4,7 +4,7 @@
  *
  */
 
-namespace Pails;
+namespace Uniondrug\Framework;
 
 use Phalcon\Http\Request\Exception;
 

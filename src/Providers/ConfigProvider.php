@@ -4,7 +4,7 @@
  *
  */
 
-namespace Pails\Providers;
+namespace Uniondrug\Framework\Providers;
 
 use Phalcon\Config;
 use Phalcon\Di\ServiceProviderInterface;
