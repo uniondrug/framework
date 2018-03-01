@@ -11,15 +11,15 @@ namespace Uniondrug\Framework;
  *
  * @package Uniondrug\Framework
  *
+ * @property \GuzzleHttp\ClientInterface             $httpClient
+ * @property \Phalcon\Cache\BackendInterface         $cache
+ * @property \Phalcon\Config                         $config
+ * @property \Phalcon\Logger\AdapterInterface        $logger
  * @property \Uniondrug\Service\Server               $serviceServer
  * @property \Uniondrug\Service\Client               $serviceClient
- * @property \GuzzleHttp\ClientInterface             $httpClient
  * @property \Uniondrug\Register\RegisterClient      $registerClient
  * @property \Uniondrug\Middleware\MiddlewareManager $middlewareManager
- * @property \Phalcon\Cache\BackendInterface         $cache
- * @property \Phalcon\Logger\AdapterInterface        $logger
  * @property \Uniondrug\Validation\Param             $validationService
- * @property \Phalcon\Config                         $config
  */
 abstract class Injectable extends \Phalcon\Di\Injectable
 {
