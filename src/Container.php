@@ -17,6 +17,8 @@ use Uniondrug\Framework\Providers\LoggerProvider;
 use Uniondrug\Framework\Providers\RouterProvider;
 
 /**
+ * 以下是可以通过 __call() 魔术方法调用的服务（注：依赖其他组件的，需要先引入组件）
+ *
  * @method \Phalcon\Annotations\AdapterInterface getAnnotation()
  * @method \Phalcon\Mvc\DispatcherInterface getDispatcher()
  * @method \Phalcon\Mvc\Url|\Phalcon\Mvc\UrlInterface getUrl()
@@ -36,6 +38,8 @@ use Uniondrug\Framework\Providers\RouterProvider;
  * @method \Phalcon\Config getConfig()
  * @method \Uniondrug\Middleware\MiddlewareManager getMiddlewareManager()
  * @method \Phalcon\Cache\BackendInterface getCache(int $lifetime = null)
+ * @method \Uniondrug\HttpClient\Client getHttpClient()
+ * @method \Uniondrug\Trace\TraceClient getTraceClient()
  */
 class Container extends Di
 {

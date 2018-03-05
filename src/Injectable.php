@@ -11,10 +11,11 @@ namespace Uniondrug\Framework;
  *
  * @package Uniondrug\Framework
  *
- * @property \GuzzleHttp\ClientInterface             $httpClient
+ * @property \GuzzleHttp\Client                      $httpClient
  * @property \Phalcon\Cache\BackendInterface         $cache
  * @property \Phalcon\Config                         $config
  * @property \Phalcon\Logger\AdapterInterface        $logger
+ * @property \Uniondrug\Trace\TraceClient            $traceClient
  * @property \Uniondrug\Service\Server               $serviceServer
  * @property \Uniondrug\Service\Client               $serviceClient
  * @property \Uniondrug\Register\RegisterClient      $registerClient
