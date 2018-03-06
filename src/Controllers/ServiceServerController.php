@@ -22,31 +22,8 @@ use Phalcon\Mvc\Controller;
  * @property \Phalcon\Logger\AdapterInterface        $logger
  * @property \Uniondrug\Validation\Param             $validationService
  * @property \Phalcon\Config                         $config
+ * @property \Uniondrug\Server\Task\Dispatcher       $taskDispatcher
  */
 abstract class ServiceServerController extends Controller
 {
-    /**
-     * @var object
-     */
-    private $serviceJsonRawBody;
-
-    /**
-     * @return \stdClass
-     * @throws \Exception
-     */
-    public function getJsonRawBody()
-    {
-        if ($this->serviceJsonRawBody === null) {
-            try {
-                $this->serviceJsonRawBody = $this->request->getJsonRawBody();
-                if ($this->serviceJsonRawBody === null) {
-                    throw new \Exception("无法解析JSON格式的RawBody参数");
-                }
-            } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
-            }
-        }
-
-        return $this->serviceJsonRawBody;
-    }
 }

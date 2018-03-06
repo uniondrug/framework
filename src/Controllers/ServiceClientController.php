@@ -25,5 +25,4 @@ use Phalcon\Mvc\Controller;
  */
 abstract class ServiceClientController extends Controller
 {
-
 }

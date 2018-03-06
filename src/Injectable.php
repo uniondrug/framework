@@ -21,6 +21,7 @@ namespace Uniondrug\Framework;
  * @property \Uniondrug\Register\RegisterClient      $registerClient
  * @property \Uniondrug\Middleware\MiddlewareManager $middlewareManager
  * @property \Uniondrug\Validation\Param             $validationService
+ * @property \Uniondrug\Server\Task\Dispatcher       $taskDispatcher
  */
 abstract class Injectable extends \Phalcon\Di\Injectable
 {
