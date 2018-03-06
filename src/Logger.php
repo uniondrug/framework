@@ -6,7 +6,7 @@
  * @date   2018-01-18
  */
 
-namespace Pails;
+namespace Uniondrug\Framework;
 
 use Phalcon\Logger\Adapter\File;
 

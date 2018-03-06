@@ -1,7 +1,7 @@
 <?php
-namespace Pails\Providers;
+namespace Uniondrug\Framework\Providers;
 
-use Pails\Events\Listeners\DatabaseListener;
+use Uniondrug\Framework\Events\Listeners\DatabaseListener;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Di\ServiceProviderInterface;
 

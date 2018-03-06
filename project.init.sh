@@ -60,8 +60,8 @@ if [ ! -e "${publicFile}" ] ; then
     echo '    exit;' >> ${publicFile}
     echo '}' >> ${publicFile}
     echo 'require_once __DIR__ . "/../vendor/autoload.php";' >> ${publicFile}
-    echo '$container = new Pails\Container(dirname(__DIR__));' >> ${publicFile}
-    echo '$container->run(Pails\Application::class);' >> ${publicFile}
+    echo '$container = new Uniondrug\Framework\Container(dirname(__DIR__));' >> ${publicFile}
+    echo '$container->run(Uniondrug\Framework\Application::class);' >> ${publicFile}
 fi
 
 echo "----success----"

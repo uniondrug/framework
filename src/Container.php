@@ -6,17 +6,19 @@
  * @author Unindrug
  */
 
-namespace Pails;
+namespace Uniondrug\Framework;
 
-use Pails\Providers\ConfigProvider;
-use Pails\Providers\DatabaseProvider;
-use Pails\Providers\LoggerProvider;
-use Pails\Providers\RouterProvider;
 use Phalcon\Di;
 use Phalcon\Di\Service;
 use Phalcon\Text;
+use Uniondrug\Framework\Providers\ConfigProvider;
+use Uniondrug\Framework\Providers\DatabaseProvider;
+use Uniondrug\Framework\Providers\LoggerProvider;
+use Uniondrug\Framework\Providers\RouterProvider;
 
 /**
+ * 以下是可以通过 __call() 魔术方法调用的服务（注：依赖其他组件的，需要先引入组件）
+ *
  * @method \Phalcon\Annotations\AdapterInterface getAnnotation()
  * @method \Phalcon\Mvc\DispatcherInterface getDispatcher()
  * @method \Phalcon\Mvc\Url|\Phalcon\Mvc\UrlInterface getUrl()
@@ -30,19 +32,21 @@ use Phalcon\Text;
  * @method \Phalcon\Db\AdapterInterface getDb()
  * @method \Phalcon\Db\AdapterInterface getDbSlave()
  * @method \Phalcon\Crypt|\Phalcon\CryptInterface getCrypt()
- * @method \Phalcon\Mvc\Model\Transaction\Manager|\Phalcon\Mvc\Model\Transaction\ManagerInterface
- *         getTransactionManager()
+ * @method \Phalcon\Mvc\Model\Transaction\Manager|\Phalcon\Mvc\Model\Transaction\ManagerInterface getTransactionManager()
  * @method \Phalcon\Mvc\Router|\Phalcon\Mvc\RouterInterface getRouter()
  * @method \Phalcon\Logger\AdapterInterface getLogger(string $name = null)
  * @method \Phalcon\Config getConfig()
- * @method \UniondrugMiddleware\MiddlewareManager getMiddlewareManager()
+ * @method \Uniondrug\Middleware\MiddlewareManager getMiddlewareManager()
+ * @method \Phalcon\Cache\BackendInterface getCache(int $lifetime = null)
+ * @method \Uniondrug\HttpClient\Client getHttpClient()
+ * @method \Uniondrug\Trace\TraceClient getTraceClient()
  */
 class Container extends Di
 {
     /**
      * 版本号
      */
-    const VERSION = '1.16.0';
+    const VERSION = '2.0.0';
 
     /**
      * 应用路径
@@ -88,7 +92,7 @@ class Container extends Di
             "modelsManager"      => new Service("modelsManager", "Phalcon\\Mvc\\Model\\Manager", true),
             "modelsMetadata"     => new Service("modelsMetadata", "Phalcon\\Mvc\\Model\\MetaData\\Memory", true),
             "response"           => new Service("response", "Phalcon\\Http\\Response", true),
-            "request"            => new Service("request", "Phalcon\\Http\\Request", true),
+            "request"            => new Service("request", "Uniondrug\\Framework\\Request", true),
             "filter"             => new Service("filter", "Phalcon\\Filter", true),
             "escaper"            => new Service("escaper", "Phalcon\\Escaper", true),
             "security"           => new Service("security", "Phalcon\\Security", true),
@@ -102,7 +106,7 @@ class Container extends Di
             $this->setInternalEventsManager($eventsManager);
         }
 
-        // 注入Pails定义的服务
+        // 注入Framework定义的服务
         $this->registerServices($this->_providers);
     }
 
