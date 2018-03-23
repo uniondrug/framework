@@ -1,18 +1,11 @@
 <?php
 /**
- * 微服务
- *
  * @author wsfuyibing <websearch@163.com>
- * @date   2017-11-03
+ * @date 2018-03-23
  */
-
-namespace Uniondrug\Framework\Controllers;
-
-use Phalcon\Mvc\Controller;
+namespace Uniondrug\Framework\Services;
 
 /**
- * 微服务服务端基类控制器
- *
  * @property \Uniondrug\Service\Server               $serviceServer
  * @property \Uniondrug\Service\Client               $serviceClient
  * @property \GuzzleHttp\ClientInterface             $httpClient
@@ -24,6 +17,6 @@ use Phalcon\Mvc\Controller;
  * @property \Phalcon\Config                         $config
  * @property \Uniondrug\Server\Task\Dispatcher       $taskDispatcher
  */
-abstract class ServiceServerController extends Controller
+trait ServiceTrait
 {
 }

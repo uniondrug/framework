@@ -1,7 +1,7 @@
 <?php
 /**
  * @author wsfuyibing <websearch@163.com>
- * @date 2018-03-19
+ * @date 2018-03-23
  */
 namespace Uniondrug\Framework\Services;
 
@@ -17,6 +17,8 @@ use Phalcon\Paginator\Adapter\QueryBuilder;
  */
 abstract class Service extends Injectable
 {
+    use ServiceTrait;
+
     /**
      * 列表查询
      * <code>

@@ -6,6 +6,7 @@
 namespace Uniondrug\Framework\Logics;
 
 use Uniondrug\Framework\Injectable;
+use Uniondrug\Framework\Services\ServiceTrait;
 use Uniondrug\Structs\StructInterface;
 
 /**
@@ -14,6 +15,7 @@ use Uniondrug\Structs\StructInterface;
  */
 abstract class Logic extends Injectable implements LogicInterface
 {
+    use ServiceTrait;
     /**
      * 逻辑工厂
      *
