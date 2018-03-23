@@ -23,9 +23,11 @@ class RouterProvider implements ServiceProviderInterface
                     $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->appPath() . '/Controllers'), \RecursiveIteratorIterator::SELF_FIRST);
                     foreach ($iterator as $item) {
                         if (Text::endsWith($item, 'Controller.php', false)) {
-                            $name = str_replace([$this->appPath() . '/Controllers' . DIRECTORY_SEPARATOR, 'Controller.php'], '', $item);
-                            $name = str_replace(DIRECTORY_SEPARATOR, '\\', $name);
-                            $router->addResource('App\\Controllers\\' . $name);
+                            $name = str_replace([$this->appPath() . DIRECTORY_SEPARATOR . 'Controllers' . DIRECTORY_SEPARATOR, 'Controller.php'], '', $item);
+                            if ($name) {
+                                $name = str_replace(DIRECTORY_SEPARATOR, '\\', $name);
+                                $router->addResource('App\\Controllers\\' . $name);
+                            }
                         }
                     }
                 } else {
