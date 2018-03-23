@@ -3,10 +3,11 @@
  * 日志服务注册
  *
  */
+
 namespace Uniondrug\Framework\Providers;
 
 use Phalcon\Di\ServiceProviderInterface;
-use Uniondrug\Framework\Logger;
+use Phalcon\Logger\Adapter\File;
 
 class LoggerProvider implements ServiceProviderInterface
 {
@@ -19,19 +20,21 @@ class LoggerProvider implements ServiceProviderInterface
                 $month = date('Y-m');
                 $date = date('Y-m-d');
                 if ($this->getConfig()->path('logger.splitDir', false)) {
-                    $logPath = $this->logPath() . DIRECTORY_SEPARATOR . $logCategory . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR;
-                    $logFile = $logPath . $date . '.log';
+                    $logPath = $this->logPath() . '/' . $logCategory . '/' . $month;
+                    $logFile = $logPath . '/' . $date . '.log';
                 } else {
-                    $logPath = $this->logPath() . DIRECTORY_SEPARATOR . $logCategory . DIRECTORY_SEPARATOR;
-                    $logFile = $logPath . $date . '.log';
+                    $logPath = $this->logPath() . '/' . $logCategory;
+                    $logFile = $logPath . '/' . $date . '.log';
                 }
                 if (!@file_exists($logPath)) {
                     @mkdir($logPath, 0755, true);
                 }
-
                 $logLevel = $this->getConfig()->path('logger.level', \Phalcon\Logger::DEBUG);
-                $logger = new Logger($logFile);
-                return $logger->setLastDate($date)->setLogCategory($logCategory)->setLogLevel($logLevel);
+
+                $logger = new File($logFile);
+                $logger->setLogLevel($logLevel);
+
+                return $logger;
             }
         );
     }
