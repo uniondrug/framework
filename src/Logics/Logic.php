@@ -16,6 +16,7 @@ use Uniondrug\Structs\StructInterface;
 abstract class Logic extends Injectable implements LogicInterface
 {
     use ServiceTrait;
+
     /**
      * 逻辑工厂
      *
