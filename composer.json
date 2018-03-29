@@ -1,12 +1,12 @@
 {
   "name": "uniondrug/framework",
   "type": "library",
-  "description": "A mini framework based on phalcon",
+  "description": "Uniondrug framework. A mini framework based on Phalcon",
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [
     {
-      "name": "UnionDrug R&D",
+      "name": "Uniondrug Dev Team",
       "email": "dev@uniondrug.cn"
     }
   ],
