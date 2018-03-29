@@ -11,6 +11,20 @@ use Phalcon\Http\Request\Exception;
 class Request extends \Phalcon\Http\Request
 {
     /**
+     * @param boolean $associative
+     *
+     * @throws \Phalcon\Http\Request\Exception
+     */
+    public function getJsonRawBody($associative = null)
+    {
+        $json = parent::getJsonRawBody($associative);
+        if (json_last_error()) {
+            throw new Exception("Invalid json: " . json_last_error_msg());
+        }
+        return $json;
+    }
+
+    /**
      * Set request raw body
      *
      * @param null $body
