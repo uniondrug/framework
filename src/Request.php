@@ -1,9 +1,7 @@
 <?php
 /**
  * Request.php
- *
  */
-
 namespace Uniondrug\Framework;
 
 use Phalcon\Http\Request\Exception;
@@ -12,23 +10,23 @@ class Request extends \Phalcon\Http\Request
 {
     /**
      * @param boolean $associative
-     *
-     * @throws \Phalcon\Http\Request\Exception
+     * @return array|\stdClass
      */
     public function getJsonRawBody($associative = null)
     {
         $json = parent::getJsonRawBody($associative);
         if (json_last_error()) {
-            throw new Exception("Invalid json: " . json_last_error_msg());
+            if ($associative) {
+                return [];
+            }
+            return new \stdClass();
         }
         return $json;
     }
 
     /**
      * Set request raw body
-     *
      * @param null $body
-     *
      * @return $this
      */
     public function setRawBody($body = null)
@@ -39,9 +37,7 @@ class Request extends \Phalcon\Http\Request
 
     /**
      * Set in memory Put cache
-     *
      * @param null $data
-     *
      * @return $this
      */
     public function setPutCache($data = null)
@@ -57,28 +53,24 @@ class Request extends \Phalcon\Http\Request
     public function getMethodReplacement()
     {
         $returnMethod = "";
-
         if (isset($_SERVER['REQUEST_METHOD'])) {
             $returnMethod = strtoupper($_SERVER['REQUEST_METHOD']);
         } else {
             return "GET";
         }
-
         if ("POST" === $returnMethod) {
             $overrideMethod = $this->getHeader("X-HTTP-METHOD-OVERRIDE");
             if (!empty($overrideMethod)) {
                 $returnMethod = strtoupper($overrideMethod);
-            } elseif ($this->_httpMethodParameterOverride) {
+            } else if ($this->_httpMethodParameterOverride) {
                 if (isset($_REQUEST['_method'])) {
                     $returnMethod = strtoupper($_REQUEST['_method']);
                 }
             }
         }
-
         if (!$this->isValidHttpMethod($returnMethod)) {
             return "GET";
         }
-
         return $returnMethod;
     }
 
@@ -90,26 +82,21 @@ class Request extends \Phalcon\Http\Request
         $httpMethod = $this->getMethodReplacement();
         if (is_string($methods)) {
             if ($strict && !$this->isValidHttpMethod($methods)) {
-                throw new Exception("Invalid HTTP method: " . $methods);
+                throw new Exception("Invalid HTTP method: ".$methods);
             }
-
             return $methods == $httpMethod;
         }
-
         if (is_array($methods)) {
             foreach ($methods as $method) {
                 if ($this->isMethod($method, $strict)) {
                     return true;
                 }
             }
-
             return false;
         }
-
         if ($strict) {
             throw new Exception("Invalid HTTP method: non-string");
         }
-
         return false;
     }
 
