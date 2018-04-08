@@ -16,6 +16,7 @@ namespace Uniondrug\Framework\Services;
  * @property \Uniondrug\Validation\Param             $validationService
  * @property \Phalcon\Config                         $config
  * @property \Uniondrug\Server\Task\Dispatcher       $taskDispatcher
+ * @property \Phalcon\Db\AdapterInterface            $dbSlave
  */
 trait ServiceTrait
 {
