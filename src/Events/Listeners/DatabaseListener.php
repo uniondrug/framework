@@ -43,6 +43,7 @@ class DatabaseListener extends Injectable
      */
     public function afterQuery(Event $event, $connection)
     {
+        $processId = getmypid();
         $this->profiler->stopProfile();
 
         $profile = $this->profiler->getLastProfile();
@@ -57,7 +58,7 @@ class DatabaseListener extends Injectable
         $start = $profile->getInitialTime();
         $final = $profile->getFinalTime();
         $total = $profile->getTotalElapsedSeconds();
-        $this->getDI()->getLogger('database')->debug("[Database]: Start=$start, Final=$final, Total=$total, SQL=$sql");
+        $this->getDI()->getLogger('database')->debug("[Database][$processId]: Start=$start, Final=$final, Total=$total, SQL=$sql");
     }
 
     /**
