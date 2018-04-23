@@ -20,6 +20,7 @@ namespace Uniondrug\Framework\Services;
  * @property \Phalcon\Db\AdapterInterface            $dbSlave
  * @property \Uniondrug\Crontab\Crontab              $crontabService
  * @property \Uniondrug\TcpClient\Client             $tcpClient
+ * @property \Redis                                  $redis
  */
 trait ServiceTrait
 {
