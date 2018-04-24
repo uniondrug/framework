@@ -18,7 +18,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
      */
     public function register(\Phalcon\DiInterface $di)
     {
-        $this->registerService($di);
+        $this->registerServices($di);
 
         $this->bootstrap($di);
     }
@@ -35,7 +35,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
      *
      * @param \Phalcon\DiInterface|Container $di
      */
-    public function registerService(\Phalcon\DiInterface $di)
+    public function registerServices(\Phalcon\DiInterface $di)
     {
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($di->appPath() . DIRECTORY_SEPARATOR . 'Services'),
             \RecursiveIteratorIterator::SELF_FIRST);
