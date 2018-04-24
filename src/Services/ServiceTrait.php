@@ -1,8 +1,9 @@
 <?php
 /**
  * @author wsfuyibing <websearch@163.com>
- * @date 2018-03-23
+ * @date   2018-03-23
  */
+
 namespace Uniondrug\Framework\Services;
 
 /**
@@ -17,6 +18,10 @@ namespace Uniondrug\Framework\Services;
  * @property \Phalcon\Config                         $config
  * @property \Uniondrug\Server\Task\Dispatcher       $taskDispatcher
  * @property \Phalcon\Db\AdapterInterface            $dbSlave
+ * @property \Uniondrug\Crontab\Crontab              $crontabService
+ * @property \Uniondrug\TcpClient\Client             $tcpClient
+ * @property \Redis                                  $redis
+ * @property \Uniondrug\ServiceSdk\ServiceSdk        $serviceSdk
  */
 trait ServiceTrait
 {
