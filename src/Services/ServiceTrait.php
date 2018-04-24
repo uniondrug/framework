@@ -21,6 +21,7 @@ namespace Uniondrug\Framework\Services;
  * @property \Uniondrug\Crontab\Crontab              $crontabService
  * @property \Uniondrug\TcpClient\Client             $tcpClient
  * @property \Redis                                  $redis
+ * @property \Uniondrug\ServiceSdk\ServiceSdk        $serviceSdk
  */
 trait ServiceTrait
 {
