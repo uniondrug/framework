@@ -14,14 +14,22 @@ class Request extends \Phalcon\Http\Request
      */
     public function getJsonRawBody($associative = null)
     {
-        $json = parent::getJsonRawBody($associative);
-        if (json_last_error()) {
-            if ($associative) {
-                return [];
-            }
-            return new \stdClass();
+        $rawBody = parent::getRawBody();
+        $rawData = json_decode($rawBody, $associative);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $rawData;
         }
-        return $json;
+        $error = json_last_error_msg();
+        if ($associative) {
+            return [
+                '_error' => $error,
+                '_raw' => $rawBody
+            ];
+        }
+        $std = new \stdClass();
+        $std->_error = $error;
+        $std->_raw = $rawBody;
+        return $std;
     }
 
     /**
