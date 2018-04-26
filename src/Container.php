@@ -84,6 +84,9 @@ class Container extends Di
         // 设置主目录
         $this->setBaseDir($baseDir);
 
+        // 从.env设置环境变量
+        $this->initEnv();
+
         // 设置默认的服务
         $this->_services = [
             "annotations"        => new Service("annotations", "Phalcon\\Annotations\\Adapter\\Memory", true),
@@ -108,6 +111,20 @@ class Container extends Di
 
         // 注入Framework定义的服务
         $this->registerServices($this->_providers);
+    }
+
+    /**
+     * Init Env from .env
+     *
+     * @return void
+     */
+    public function initEnv()
+    {
+        $envFile = $this->baseDir . DIRECTORY_SEPARATOR . '.env';
+        if (file_exists($envFile) && class_exists('Symfony\\Component\\Dotenv\\Dotenv')) {
+            $dotenv = new \Symfony\Component\Dotenv\Dotenv();
+            $dotenv->load($envFile);
+        }
     }
 
     /**
