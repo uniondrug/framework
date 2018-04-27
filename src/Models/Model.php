@@ -39,7 +39,7 @@ Model::setup([
 /**
  * Model基类
  * @property string $gmtCreated 创建时间(Y-m-d H:i:s; 如 2018-03-01 08:09:10)
- * @property string $gmtUpcated 修改时间(Y-m-d H:i:s; 如 2018-03-10 11:12:13)
+ * @property string $gmtUpdated 修改时间(Y-m-d H:i:s; 如 2018-03-10 11:12:13)
  * @package App\Models
  */
 abstract class Model extends PhalconModel
