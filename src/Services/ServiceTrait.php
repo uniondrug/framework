@@ -7,21 +7,22 @@
 namespace Uniondrug\Framework\Services;
 
 /**
+ * @property \GuzzleHttp\ClientInterface             $httpClient
+ * @property \Phalcon\Cache\BackendInterface         $cache
+ * @property \Phalcon\Config                         $config
+ * @property \Phalcon\Db\AdapterInterface            $dbSlave
+ * @property \Phalcon\Logger\AdapterInterface        $logger
+ * @property \Redis                                  $redis
+ * @property \Uniondrug\Crontab\Crontab              $crontabService
+ * @property \Uniondrug\Middleware\MiddlewareManager $middlewareManager
+ * @property \Uniondrug\Register\RegisterClient      $registerClient
  * @property \Uniondrug\Service\Server               $serviceServer
  * @property \Uniondrug\Service\Client               $serviceClient
- * @property \GuzzleHttp\ClientInterface             $httpClient
- * @property \Uniondrug\Register\RegisterClient      $registerClient
- * @property \Uniondrug\Middleware\MiddlewareManager $middlewareManager
- * @property \Phalcon\Cache\BackendInterface         $cache
- * @property \Phalcon\Logger\AdapterInterface        $logger
- * @property \Uniondrug\Validation\Param             $validationService
- * @property \Phalcon\Config                         $config
- * @property \Uniondrug\Server\Task\Dispatcher       $taskDispatcher
- * @property \Phalcon\Db\AdapterInterface            $dbSlave
- * @property \Uniondrug\Crontab\Crontab              $crontabService
  * @property \Uniondrug\TcpClient\Client             $tcpClient
- * @property \Redis                                  $redis
+ * @property \Uniondrug\Trace\TraceClient            $traceClient
+ * @property \Uniondrug\Server\Task\Dispatcher       $taskDispatcher
  * @property \Uniondrug\ServiceSdk\ServiceSdk        $serviceSdk
+ * @property \Uniondrug\Validation\Param             $validationService
  */
 trait ServiceTrait
 {
