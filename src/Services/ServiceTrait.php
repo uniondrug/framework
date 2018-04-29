@@ -14,6 +14,7 @@ namespace Uniondrug\Framework\Services;
  * @property \Phalcon\Logger\AdapterInterface        $logger
  * @property \Redis                                  $redis
  * @property \Uniondrug\Crontab\Crontab              $crontabService
+ * @property \Uniondrug\Framework\Container          $di
  * @property \Uniondrug\Middleware\MiddlewareManager $middlewareManager
  * @property \Uniondrug\Register\RegisterClient      $registerClient
  * @property \Uniondrug\Service\Server               $serviceServer

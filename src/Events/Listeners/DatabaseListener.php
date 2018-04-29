@@ -7,8 +7,8 @@
 namespace Uniondrug\Framework\Events\Listeners;
 
 use Phalcon\Db\Profiler;
-use Phalcon\Di\Injectable;
 use Phalcon\Events\Event;
+use Uniondrug\Framework\Injectable;
 
 /**
  * Class DatabaseListener
@@ -30,6 +30,9 @@ class DatabaseListener extends Injectable
 
     /**
      * This is executed if the event triggered is 'beforeQuery'
+     *
+     * @param \Phalcon\Events\Event $event
+     * @param \Phalcon\Db\Adapter   $connection
      */
     public function beforeQuery(Event $event, $connection)
     {
@@ -40,15 +43,19 @@ class DatabaseListener extends Injectable
 
     /**
      * This is executed if the event triggered is 'afterQuery'
+     *
+     * @param \Phalcon\Events\Event $event
+     * @param \Phalcon\Db\Adapter   $connection
      */
     public function afterQuery(Event $event, $connection)
     {
         $processId = getmypid();
         $this->profiler->stopProfile();
 
+        /** @var \Phalcon\Db\Profiler\Item $profile */
         $profile = $this->profiler->getLastProfile();
-        $sql   = $profile->getSQLStatement();
-        $vars  = $profile->getSQLVariables();
+        $sql = $profile->getSQLStatement();
+        $vars = $profile->getSQLVariables();
         if (count($vars)) {
             $sql = str_replace(array_map(function ($v) {
                 return ':' . $v;

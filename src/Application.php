@@ -7,6 +7,8 @@ namespace Uniondrug\Framework;
 
 /**
  * Class Application
+ *
+ * @property \Uniondrug\Framework\Container $di
  */
 class Application extends \Phalcon\Mvc\Application
 {
