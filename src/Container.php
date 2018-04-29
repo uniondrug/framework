@@ -32,7 +32,7 @@ use Uniondrug\Framework\Providers\RouterProvider;
  * @method \Phalcon\Db\AdapterInterface getDb()
  * @method \Phalcon\Db\AdapterInterface getDbSlave()
  * @method \Phalcon\Crypt|\Phalcon\CryptInterface getCrypt()
- * @method \Phalcon\Mvc\Model\Transaction\Manager|\Phalcon\Mvc\Model\Transaction\ManagerInterface getTransactionManager()
+ * @method \Phalcon\Mvc\Model\Transaction\Manager getTransactionManager()
  * @method \Phalcon\Mvc\Router|\Phalcon\Mvc\RouterInterface getRouter()
  * @method \Phalcon\Logger\AdapterInterface getLogger(string $name = null)
  * @method \Phalcon\Config getConfig()

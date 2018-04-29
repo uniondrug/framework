@@ -1,12 +1,16 @@
 <?php
+
 namespace Uniondrug\Framework\Providers;
 
-use Uniondrug\Framework\Events\Listeners\DatabaseListener;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Di\ServiceProviderInterface;
+use Uniondrug\Framework\Events\Listeners\DatabaseListener;
 
 class DatabaseProvider implements ServiceProviderInterface
 {
+    /**
+     * @param \Phalcon\DiInterface|\Uniondrug\Framework\Container $di
+     */
     public function register(\Phalcon\DiInterface $di)
     {
         $di->set(
@@ -16,6 +20,7 @@ class DatabaseProvider implements ServiceProviderInterface
                 if ($config) {
                     $db = new Mysql($config->connection->toArray());
                     $db->setEventsManager($this->getEventsManager());
+
                     return $db;
                 } else {
                     throw new \RuntimeException('No database config found. please check config file exists or APP_ENV is configed');
@@ -34,6 +39,7 @@ class DatabaseProvider implements ServiceProviderInterface
                     if ($config) {
                         $db = new Mysql($config->slaveConnection->toArray());
                         $db->setEventsManager($this->getEventsManager());
+
                         return $db;
                     } else {
                         throw new \RuntimeException('No readonly database config found. please check config file exists or APP_ENV is configed');

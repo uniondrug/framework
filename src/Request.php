@@ -2,6 +2,7 @@
 /**
  * Request.php
  */
+
 namespace Uniondrug\Framework;
 
 use Phalcon\Http\Request\Exception;
@@ -10,6 +11,7 @@ class Request extends \Phalcon\Http\Request
 {
     /**
      * @param boolean $associative
+     *
      * @return array|\stdClass
      */
     public function getJsonRawBody($associative = null)
@@ -23,39 +25,47 @@ class Request extends \Phalcon\Http\Request
         if ($associative) {
             return [
                 '_error' => $error,
-                '_raw' => $rawBody
+                '_raw'   => $rawBody,
             ];
         }
         $std = new \stdClass();
         $std->_error = $error;
         $std->_raw = $rawBody;
+
         return $std;
     }
 
     /**
      * Set request raw body
+     *
      * @param null $body
+     *
      * @return $this
      */
     public function setRawBody($body = null)
     {
         $this->_rawBody = $body;
+
         return $this;
     }
 
     /**
      * Set in memory Put cache
+     *
      * @param null $data
+     *
      * @return $this
      */
     public function setPutCache($data = null)
     {
         $this->_putCache = $data;
+
         return $this;
     }
 
     /**
      * Replace method for getMethod() which cause memory leak with swoole.
+     *
      * @return string
      */
     public function getMethodReplacement()
@@ -79,6 +89,7 @@ class Request extends \Phalcon\Http\Request
         if (!$this->isValidHttpMethod($returnMethod)) {
             return "GET";
         }
+
         return $returnMethod;
     }
 
@@ -90,8 +101,9 @@ class Request extends \Phalcon\Http\Request
         $httpMethod = $this->getMethodReplacement();
         if (is_string($methods)) {
             if ($strict && !$this->isValidHttpMethod($methods)) {
-                throw new Exception("Invalid HTTP method: ".$methods);
+                throw new Exception("Invalid HTTP method: " . $methods);
             }
+
             return $methods == $httpMethod;
         }
         if (is_array($methods)) {
@@ -100,11 +112,13 @@ class Request extends \Phalcon\Http\Request
                     return true;
                 }
             }
+
             return false;
         }
         if ($strict) {
             throw new Exception("Invalid HTTP method: non-string");
         }
+
         return false;
     }
 

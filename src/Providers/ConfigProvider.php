@@ -41,6 +41,7 @@ class ConfigProvider implements ServiceProviderInterface
                         }
                     }
                 }
+
                 return $config;
             }
         );
