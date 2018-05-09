@@ -27,8 +27,8 @@ class LoggerProvider implements ServiceProviderInterface
                     $logFile = $logPath . '/' . $date . '.log';
                 }
                 try {
-                    if (!@file_exists($logPath)) {
-                        @mkdir($logPath, 0755, true);
+                    if (!file_exists($logPath)) {
+                        mkdir($logPath, 0755, true);
                     }
                 } catch (\Throwable $e) {
                     // skip. multi process may try to make dir at the same time. just skip errors.
