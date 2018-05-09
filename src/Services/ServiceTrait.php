@@ -7,14 +7,14 @@
 namespace Uniondrug\Framework\Services;
 
 /**
- * @property \GuzzleHttp\ClientInterface             $httpClient
+ * @property \GuzzleHttp\Client                      $httpClient
  * @property \Phalcon\Cache\BackendInterface         $cache
  * @property \Phalcon\Config                         $config
  * @property \Phalcon\Db\AdapterInterface            $dbSlave
  * @property \Phalcon\Logger\AdapterInterface        $logger
  * @property \Redis                                  $redis
- * @property \Uniondrug\Crontab\Crontab              $crontabService
  * @property \Uniondrug\Framework\Container          $di
+ * @property \Uniondrug\Crontab\Crontab              $crontabService
  * @property \Uniondrug\Middleware\MiddlewareManager $middlewareManager
  * @property \Uniondrug\Register\RegisterClient      $registerClient
  * @property \Uniondrug\Service\Server               $serviceServer

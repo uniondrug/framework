@@ -46,7 +46,7 @@ class Container extends Di
     /**
      * 版本号
      */
-    const VERSION = '2.0.0';
+    const VERSION = '2.8.4';
 
     /**
      * 应用路径

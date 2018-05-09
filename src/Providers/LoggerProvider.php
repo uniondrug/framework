@@ -26,8 +26,12 @@ class LoggerProvider implements ServiceProviderInterface
                     $logPath = $this->logPath() . '/' . $logCategory;
                     $logFile = $logPath . '/' . $date . '.log';
                 }
-                if (!@file_exists($logPath)) {
-                    @mkdir($logPath, 0755, true);
+                try {
+                    if (!file_exists($logPath)) {
+                        mkdir($logPath, 0755, true);
+                    }
+                } catch (\Throwable $e) {
+                    // skip. multi process may try to make dir at the same time. just skip errors.
                 }
                 $logLevel = $this->getConfig()->path('logger.level', \Phalcon\Logger::DEBUG);
 

@@ -1,4 +1,7 @@
 <?php
+
+use Uniondrug\Framework\Container;
+
 if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable.
@@ -49,5 +52,37 @@ if (!function_exists('value')) {
     function value($value)
     {
         return $value instanceof Closure ? $value() : $value;
+    }
+}
+
+if (!function_exists('app')) {
+    /**
+     * @return Container
+     */
+    function app()
+    {
+        return Container::getDefault();
+    }
+}
+
+if (!function_exists('config')) {
+    /**
+     * @return \Phalcon\Config
+     */
+    function config()
+    {
+        return app()->getConfig();
+    }
+}
+
+if (!function_exists('logger')) {
+    /**
+     * @param string $name
+     *
+     * @return \Phalcon\Logger\AdapterInterface
+     */
+    function logger($name = 'app')
+    {
+        return app()->getLogger($name);
     }
 }
