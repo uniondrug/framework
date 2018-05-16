@@ -32,7 +32,7 @@ Model::setup([
     'lateStateBinding' => false,
     'castOnHydrate' => false,
     'ignoreUnknownColumns' => true,
-    'updateSnapshotOnSave' => false,
+    'updateSnapshotOnSave' => true,
     'disableAssignSetters' => false
 ]);
 
@@ -134,6 +134,9 @@ abstract class Model extends PhalconModel
      */
     public function initialize()
     {
+        // set useDynamicUpdate. 动态更新，即没有变化的字段在update时不会出现在sql里面。否则每次都是全字段更新。
+        $this->useDynamicUpdate(true);
+
         $this->addBehavior(new Timestampable([
             'beforeCreate' => [
                 'field' => [
