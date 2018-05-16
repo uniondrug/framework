@@ -13,6 +13,7 @@ namespace Uniondrug\Framework\Services;
  * @property \Phalcon\Db\AdapterInterface            $dbSlave
  * @property \Phalcon\Logger\AdapterInterface        $logger
  * @property \Redis                                  $redis
+ * @property \Uniondrug\Redis\RedisLock              $redisLock
  * @property \Uniondrug\Framework\Container          $di
  * @property \Uniondrug\Crontab\Crontab              $crontabService
  * @property \Uniondrug\Middleware\MiddlewareManager $middlewareManager
