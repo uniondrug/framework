@@ -57,9 +57,31 @@ class DatabaseListener extends Injectable
         $sql = $profile->getSQLStatement();
         $vars = $profile->getSQLVariables();
         if (count($vars)) {
-            $sql = str_replace(array_map(function ($v) {
-                return ':' . $v;
-            }, array_keys($vars)), array_values($vars), $sql);
+            if ('select' == strtolower(substr($sql, 0, 7))) {
+                // 针对select的替换
+                $sql = str_replace(array_map(function ($v) {
+                    return ':' . $v;
+                }, array_keys($vars)), array_values($vars), $sql);
+            } else {
+                // 针对update/insert的替换
+                $replaced = 0;
+                $cursor = 0;
+                while ($s = substr($sql, $cursor, 1)) {
+                    if ($s == '?') {
+                        if (is_string($vars[$replaced])) {
+                            $replacement = "\"" . $vars[$replaced] . "\"";
+                        } else {
+                            $replacement = $vars[$replaced];
+                        }
+                        $sql = substr_replace($sql, $replacement , $cursor, 1);
+
+                        $cursor += strlen($replacement);
+                        $replaced ++;
+                    } else {
+                        $cursor ++;
+                    }
+                }
+            }
         }
 
         $start = $profile->getInitialTime();
