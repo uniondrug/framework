@@ -57,7 +57,7 @@ class DatabaseListener extends Injectable
         $sql = $profile->getSQLStatement();
         $vars = $profile->getSQLVariables();
         if (count($vars)) {
-            if ('select' == strtolower(substr($sql, 0, 7))) {
+            if ('select' == strtolower(substr($sql, 0, 6))) {
                 // 针对select的替换
                 $sql = str_replace(array_map(function ($v) {
                     return ':' . $v;
