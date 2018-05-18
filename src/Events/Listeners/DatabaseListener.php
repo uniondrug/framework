@@ -31,8 +31,8 @@ class DatabaseListener extends Injectable
     /**
      * This is executed if the event triggered is 'beforeQuery'
      *
-     * @param \Phalcon\Events\Event $event
-     * @param \Phalcon\Db\Adapter   $connection
+     * @param \Phalcon\Events\Event                                $event
+     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
      */
     public function beforeQuery(Event $event, $connection)
     {
@@ -44,8 +44,8 @@ class DatabaseListener extends Injectable
     /**
      * This is executed if the event triggered is 'afterQuery'
      *
-     * @param \Phalcon\Events\Event $event
-     * @param \Phalcon\Db\Adapter   $connection
+     * @param \Phalcon\Events\Event                                $event
+     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
      */
     public function afterQuery(Event $event, $connection)
     {
@@ -73,12 +73,12 @@ class DatabaseListener extends Injectable
                         } else {
                             $replacement = $vars[$replaced];
                         }
-                        $sql = substr_replace($sql, $replacement , $cursor, 1);
+                        $sql = substr_replace($sql, $replacement, $cursor, 1);
 
                         $cursor += strlen($replacement);
-                        $replaced ++;
+                        $replaced++;
                     } else {
-                        $cursor ++;
+                        $cursor++;
                     }
                 }
             }
@@ -87,7 +87,7 @@ class DatabaseListener extends Injectable
         $start = $profile->getInitialTime();
         $final = $profile->getFinalTime();
         $total = $profile->getTotalElapsedSeconds();
-        $this->getDI()->getLogger('database')->debug("[Database][$processId]: Start=$start, Final=$final, Total=$total, SQL=$sql");
+        logger('database')->debug("[Database][$processId]: Start=$start, Final=$final, Total=$total, SQL=$sql");
     }
 
     /**
@@ -96,5 +96,84 @@ class DatabaseListener extends Injectable
     public function getProfiler()
     {
         return $this->profiler;
+    }
+
+    /**
+     * @param \Phalcon\Events\Event                                $event
+     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
+     */
+    public function beginTransaction(Event $event, $connection)
+    {
+        $processId = getmypid();
+        $start = microtime(1);
+        $level = $connection->getTransactionLevel();
+
+        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, Transaction start");
+    }
+
+    /**
+     * @param \Phalcon\Events\Event                                $event
+     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
+     * @param                                                      $savepointName
+     */
+    public function createSavepoint(Event $event, $connection, $savepointName)
+    {
+        $processId = getmypid();
+        $start = microtime(1);
+        $level = $connection->getTransactionLevel();
+
+        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, create savepoint $savepointName");
+    }
+
+    /**
+     * @param \Phalcon\Events\Event                                $event
+     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
+     */
+    public function rollbackTransaction(Event $event, $connection)
+    {
+        $processId = getmypid();
+        $start = microtime(1);
+        logger('database')->debug("[Database][$processId]: Start=$start, rollback transaction");
+    }
+
+    /**
+     * @param \Phalcon\Events\Event                                $event
+     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
+     * @param                                                      $savepointName
+     */
+    public function rollbackSavepoint(Event $event, $connection, $savepointName)
+    {
+        $processId = getmypid();
+        $start = microtime(1);
+        $level = $connection->getTransactionLevel();
+
+        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, rollback savepoint $savepointName");
+    }
+
+    /**
+     * @param \Phalcon\Events\Event                                $event
+     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
+     */
+    public function commitTransaction(Event $event, $connection)
+    {
+        $processId = getmypid();
+        $start = microtime(1);
+        $level = $connection->getTransactionLevel();
+
+        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, commit transaction");
+    }
+
+    /**
+     * @param \Phalcon\Events\Event                                $event
+     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
+     * @param                                                      $savepointName
+     */
+    public function releaseSavepoint(Event $event, $connection, $savepointName)
+    {
+        $processId = getmypid();
+        $start = microtime(1);
+        $level = $connection->getTransactionLevel();
+
+        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, release savepoint $savepointName");
     }
 }
