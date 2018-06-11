@@ -87,7 +87,7 @@ class DatabaseListener extends Injectable
         $start = $profile->getInitialTime();
         $final = $profile->getFinalTime();
         $total = $profile->getTotalElapsedSeconds();
-        logger('database')->debug("[Database][$processId]: Start=$start, Final=$final, Total=$total, SQL=$sql");
+        \logger('database')->debug("[Database][$processId]: Start=$start, Final=$final, Total=$total, SQL=$sql");
     }
 
     /**
@@ -108,7 +108,7 @@ class DatabaseListener extends Injectable
         $start = microtime(1);
         $level = $connection->getTransactionLevel();
 
-        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, Transaction start");
+        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, Transaction start");
     }
 
     /**
@@ -122,7 +122,7 @@ class DatabaseListener extends Injectable
         $start = microtime(1);
         $level = $connection->getTransactionLevel();
 
-        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, create savepoint $savepointName");
+        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, create savepoint $savepointName");
     }
 
     /**
@@ -133,7 +133,7 @@ class DatabaseListener extends Injectable
     {
         $processId = getmypid();
         $start = microtime(1);
-        logger('database')->debug("[Database][$processId]: Start=$start, rollback transaction");
+        \logger('database')->debug("[Database][$processId]: Start=$start, rollback transaction");
     }
 
     /**
@@ -147,7 +147,7 @@ class DatabaseListener extends Injectable
         $start = microtime(1);
         $level = $connection->getTransactionLevel();
 
-        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, rollback savepoint $savepointName");
+        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, rollback savepoint $savepointName");
     }
 
     /**
@@ -160,7 +160,7 @@ class DatabaseListener extends Injectable
         $start = microtime(1);
         $level = $connection->getTransactionLevel();
 
-        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, commit transaction");
+        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, commit transaction");
     }
 
     /**
@@ -174,6 +174,6 @@ class DatabaseListener extends Injectable
         $start = microtime(1);
         $level = $connection->getTransactionLevel();
 
-        logger('database')->debug("[Database][$processId]: Start=$start, level=$level, release savepoint $savepointName");
+        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, release savepoint $savepointName");
     }
 }

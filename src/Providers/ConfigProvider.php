@@ -17,9 +17,9 @@ class ConfigProvider implements ServiceProviderInterface
         $di->setShared(
             'config',
             function () {
-                $env = $this->environment();
+                $env = \app()->environment();
                 $config = new Config([]);
-                $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->configPath()), \RecursiveIteratorIterator::SELF_FIRST);
+                $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(\app()->configPath()), \RecursiveIteratorIterator::SELF_FIRST);
                 foreach ($iterator as $item) {
                     if (Text::endsWith($item, '.php', false)) {
                         $name = str_replace([$this->configPath() . DIRECTORY_SEPARATOR, '.php'], '', $item);

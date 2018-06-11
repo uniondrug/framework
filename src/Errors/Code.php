@@ -57,7 +57,9 @@ abstract class Code
 
     /**
      * 导出MARKDOWN格式编码文档
+     *
      * @return string
+     * @throws \ReflectionException
      * @example Error::exportMarkdown()
      */
     public static function exportMarkdown()
@@ -65,8 +67,8 @@ abstract class Code
         $message = '| 编码 | 常量名 | 用途与描述 |';
         $message .= "\r\n".'| :-- | :-- | :-- |';
         $instance = new static();
-        $refelect = new \ReflectionClass($instance);
-        foreach ($refelect->getConstants() as $name => $code) {
+        $reflect = new \ReflectionClass($instance);
+        foreach ($reflect->getConstants() as $name => $code) {
             $message .= "\r\n";
             $message .= sprintf("| %d | %s | %s |", static::$codePlus + $code, $name, static::getMessage($code));
         }

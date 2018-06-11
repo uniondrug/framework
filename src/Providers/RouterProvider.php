@@ -17,13 +17,13 @@ class RouterProvider implements ServiceProviderInterface
         $di->setShared(
             'router',
             function () {
-                if ($this->getConfig()->path('app.useAnnotationRouter', false)) {
+                if (\config()->path('app.useAnnotationRouter', false)) {
                     // 启用注解路由，此时默认路由关闭
                     $router = new \Uniondrug\Framework\Router(false);
-                    $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->appPath() . DIRECTORY_SEPARATOR . 'Controllers'), \RecursiveIteratorIterator::SELF_FIRST);
+                    $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(\app()->appPath() . DIRECTORY_SEPARATOR . 'Controllers'), \RecursiveIteratorIterator::SELF_FIRST);
                     foreach ($iterator as $item) {
                         if (Text::endsWith($item, 'Controller.php', false)) {
-                            $name = str_replace([$this->appPath() . DIRECTORY_SEPARATOR . 'Controllers' . DIRECTORY_SEPARATOR, 'Controller.php'], '', $item);
+                            $name = str_replace([\app()->appPath() . DIRECTORY_SEPARATOR . 'Controllers' . DIRECTORY_SEPARATOR, 'Controller.php'], '', $item);
                             if ($name) {
                                 $name = str_replace(DIRECTORY_SEPARATOR, '\\', $name);
                                 $router->addResource('App\\Controllers\\' . $name);
@@ -42,7 +42,7 @@ class RouterProvider implements ServiceProviderInterface
                 /**
                  * 载入自定义路由
                  */
-                if ($routes = $this->getConfig()->get('routes')) {
+                if ($routes = \config()->get('routes')) {
                     foreach ($routes as $pattern => $route) {
                         if (is_string($route)) {
                             $router->add($pattern, $route);

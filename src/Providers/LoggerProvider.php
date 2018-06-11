@@ -19,11 +19,11 @@ class LoggerProvider implements ServiceProviderInterface
             function ($logCategory = 'app') {
                 $month = date('Y-m');
                 $date = date('Y-m-d');
-                if ($this->getConfig()->path('logger.splitDir', false)) {
-                    $logPath = $this->logPath() . '/' . $logCategory . '/' . $month;
+                if (\config()->path('logger.splitDir', false)) {
+                    $logPath = \app()->logPath() . '/' . $logCategory . '/' . $month;
                     $logFile = $logPath . '/' . $date . '.log';
                 } else {
-                    $logPath = $this->logPath() . '/' . $logCategory;
+                    $logPath = \app()->logPath() . '/' . $logCategory;
                     $logFile = $logPath . '/' . $date . '.log';
                 }
                 try {
@@ -33,7 +33,7 @@ class LoggerProvider implements ServiceProviderInterface
                 } catch (\Throwable $e) {
                     // skip. multi process may try to make dir at the same time. just skip errors.
                 }
-                $logLevel = $this->getConfig()->path('logger.level', \Phalcon\Logger::DEBUG);
+                $logLevel = \config()->path('logger.level', \Phalcon\Logger::DEBUG);
 
                 $logger = new File($logFile);
                 $logger->setLogLevel($logLevel);
