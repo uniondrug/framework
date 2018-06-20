@@ -16,10 +16,10 @@ class DatabaseProvider implements ServiceProviderInterface
         $di->set(
             'db',
             function () {
-                $config = $this->getConfig()->path('database');
+                $config = \config()->path('database');
                 if ($config) {
                     $db = new Mysql($config->connection->toArray());
-                    $db->setEventsManager($this->getEventsManager());
+                    $db->setEventsManager(\app()->getEventsManager());
 
                     return $db;
                 } else {
@@ -31,14 +31,14 @@ class DatabaseProvider implements ServiceProviderInterface
         /**
          * set readonly connection
          */
-        if ((true === $di->getConfig()->path('database.useSlave', false)) && $di->getConfig()->path('database.slaveConnection', false)) {
+        if ((true === \config()->path('database.useSlave', false)) && \config()->path('database.slaveConnection', false)) {
             $di->set(
                 'dbSlave',
                 function () {
-                    $config = $this->getConfig()->get('database');
+                    $config = \config()->get('database');
                     if ($config) {
                         $db = new Mysql($config->slaveConnection->toArray());
-                        $db->setEventsManager($this->getEventsManager());
+                        $db->setEventsManager(\app()->getEventsManager());
 
                         return $db;
                     } else {
@@ -49,8 +49,8 @@ class DatabaseProvider implements ServiceProviderInterface
         }
 
         // 打开数据库调试日志
-        if ($di->getConfig()->path('database.debug', false)) {
-            $di->getEventsManager()->attach('db', new DatabaseListener());
+        if (\config()->path('database.debug', false)) {
+            \app()->getEventsManager()->attach('db', new DatabaseListener());
         }
     }
 }

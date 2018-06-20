@@ -18,6 +18,7 @@ use Uniondrug\Framework\Providers\RouterProvider;
  * 以下是可以通过 __call() 魔术方法调用的服务（注：依赖其他组件的，需要先引入组件）
  * @method \Phalcon\Annotations\AdapterInterface getAnnotation()
  * @method \Phalcon\Mvc\DispatcherInterface getDispatcher()
+ * @method \Phalcon\Events\Manager getEventsManager()
  * @method \Phalcon\Mvc\Url|\Phalcon\Mvc\UrlInterface getUrl()
  * @method \Phalcon\Mvc\Model\Manager|\Phalcon\Mvc\Model\ManagerInterface getModelsManager()
  * @method \Phalcon\Mvc\Model\MetaData\Memory|\Phalcon\Mvc\Model\MetadataInterface getModelsMetadata()
@@ -43,7 +44,7 @@ class Container extends Di
     /**
      * 版本号
      */
-    const VERSION = '2.8.4';
+    const VERSION = '2.8.8';
     /**
      * 应用路径
      * @var

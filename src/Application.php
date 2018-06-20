@@ -18,8 +18,8 @@ class Application extends \Phalcon\Mvc\Application
         /**
          * Providers
          */
-        $providers = $this->di->getConfig()->path('app.providers', []);
-        $providers === null || $this->di->registerServices($providers);
+        $providers = \config()->path('app.providers', []);
+        $providers === null || \app()->registerServices($providers);
         // disable views
         $this->useImplicitView(false);
 

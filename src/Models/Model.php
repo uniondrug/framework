@@ -1,7 +1,7 @@
 <?php
 /**
  * @author wsfuyibing <websearch@163.com>
- * @date 2018-03-19
+ * @date   2018-03-19
  */
 namespace Uniondrug\Framework\Models;
 
@@ -112,10 +112,8 @@ abstract class Model extends PhalconModel
 
     /**
      * 时间格式化
-     *
-     * @param string $name 字段名称
+     * @param string $name   字段名称
      * @param string $format 格式化
-     *
      * @return string
      */
     final public function getModelTimeformat($name, $format)
@@ -136,7 +134,6 @@ abstract class Model extends PhalconModel
     {
         // set useDynamicUpdate. 动态更新，即没有变化的字段在update时不会出现在sql里面。否则每次都是全字段更新。
         $this->useDynamicUpdate(true);
-
         $this->addBehavior(new Timestampable([
             'beforeCreate' => [
                 'field' => [
@@ -150,5 +147,14 @@ abstract class Model extends PhalconModel
                 'format' => 'Y-m-d H:i:s',
             ],
         ]));
+    }
+
+    /**
+     * 模型数据转
+     * @return string
+     */
+    public function toJson()
+    {
+        return json_encode($this->toArray(), JSON_UNESCAPED_UNICODE);
     }
 }

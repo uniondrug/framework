@@ -71,7 +71,7 @@ if (!function_exists('config')) {
      */
     function config()
     {
-        return app()->getConfig();
+        return \app()->getConfig();
     }
 }
 
@@ -83,6 +83,6 @@ if (!function_exists('logger')) {
      */
     function logger($name = 'app')
     {
-        return app()->getLogger($name);
+        return \app()->getLogger($name);
     }
 }
