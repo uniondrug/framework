@@ -155,6 +155,37 @@ abstract class Model extends PhalconModel
      */
     public function toJson()
     {
-        return json_encode($this->toArray(), JSON_UNESCAPED_UNICODE);
+        $data = $this->parseArrayDataType($this->toArray());
+        return json_encode($data, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function parseArrayDataType($data)
+    {
+        foreach ($data as & $value) {
+            $t = strtolower(gettype($value));
+            switch ($t) {
+                case 'bool' :
+                case 'boolean' :
+                    $value = $value ? '1' : '0';
+                    break;
+                case 'double' :
+                case 'float' :
+                case 'int' :
+                case 'integer' :
+                    $value = (string) $value;
+                    break;
+                case 'null' :
+                    $value = '';
+                    break;
+                case 'array' :
+                    $value = $this->parseArrayDataType($value);
+                    break;
+            }
+        }
+        return $data;
     }
 }
