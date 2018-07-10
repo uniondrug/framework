@@ -6,9 +6,11 @@
 namespace Uniondrug\Framework\Controllers;
 
 use Phalcon\Mvc\Controller as PhalconController;
+use Uniondrug\Framework\Request;
 use Uniondrug\Framework\Services\ServiceTrait;
 
 /**
+ * @property Request $request
  * @package Uniondrug\Framework\Controllers
  */
 abstract class Controller extends PhalconController

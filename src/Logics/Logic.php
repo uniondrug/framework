@@ -96,12 +96,25 @@ abstract class Logic extends Injectable implements LogicInterface
     }
 
     /**
+     * 消息内容
+     * @param StructInterface $struct
+     * @return string
+     */
+    public function getTopicBody(StructInterface $struct, $options = JSON_UNESCAPED_UNICODE)
+    {
+        return $struct->toJson($options);
+    }
+
+    /**
      * Logic执行完成之后的MQ业务检查
      * @param StructInterface $struct
      */
     final public function afterFactory(StructInterface $struct)
     {
-        $data = ['message' => '', 'delay' => $this->getTopicDelay()];
+        $data = [
+            'message' => '',
+            'delay' => $this->getTopicDelay()
+        ];
         // 1. Topic名称必须
         $data['topicName'] = $this->getTopicName();
         if (!$data['topicName']) {
@@ -116,7 +129,7 @@ abstract class Logic extends Injectable implements LogicInterface
         }
         // 3. 计算消息内容
         $jsonOption = JSON_UNESCAPED_UNICODE;
-        $message = ['body' => $struct->toJson($jsonOption)];
+        $message = ['body' => $this->getTopicBody($struct, $jsonOption)];
         $data['message'] = json_encode($message, $jsonOption);
         // 4. 消息Logger
         $uuid = uniqid();
