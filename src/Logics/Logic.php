@@ -17,6 +17,11 @@ abstract class Logic extends Injectable implements LogicInterface
 {
     use ServiceTrait;
     /**
+     * 是否批量消息
+     * @var bool
+     */
+    public $topicBatch = false;
+    /**
      * 延迟发送
      * `0` : 不延迟
      * `n` : 延迟时长(单位: 秒)
@@ -33,6 +38,16 @@ abstract class Logic extends Injectable implements LogicInterface
      * @var bool|string
      */
     public $topicTag = false;
+    /**
+     * MQ默认优先级
+     * @var int
+     */
+    public $priority = 0;
+    /**
+     * @var int
+     */
+    private $defaultPriority = 8;
+    private $topicBatches = [];
 
     /**
      * 逻辑工厂
@@ -43,10 +58,19 @@ abstract class Logic extends Injectable implements LogicInterface
     {
         $logic = new static();
         $struct = $logic->run($payload);
-        if ($struct instanceof StructInterface) {
-            $logic->afterFactory($struct);
-        }
+        $logic->afterFactory($struct);
         return $struct;
+    }
+
+    /**
+     * 分批执行
+     * @param array $datas
+     * @return $this
+     */
+    protected function addTopicBatch(array $datas)
+    {
+        $this->topicBatches[] = $datas;
+        return $this;
     }
 
     /**
@@ -74,6 +98,18 @@ abstract class Logic extends Injectable implements LogicInterface
     }
 
     /**
+     * 读取MQ优先级
+     * @return int
+     */
+    public function getTopicPriority()
+    {
+        if (is_numeric($this->priority) && $this->priority > 0) {
+            return $this->priority;
+        }
+        return $this->defaultPriority;
+    }
+
+    /**
      * 读取MQ消息标签
      * 该方法可以子类中覆盖, 定义消息的Tag名称,
      * 默认为实例逻辑的类名
@@ -81,70 +117,67 @@ abstract class Logic extends Injectable implements LogicInterface
      */
     public function getTopicTag()
     {
-        // 1. 从覆盖属性中读取
-        if ($this->topicTag !== false) {
-            return $this->topicTag;
-        }
-        // 2. 计算Logic名称
-        $names = explode('\\', get_class($this));
-        $length = count($names) - 1;
-        if ($length >= 0) {
-            return strtoupper($names[$length]);
-        }
-        // 3. 非法名称
-        return false;
-    }
-
-    /**
-     * 消息内容
-     * @param StructInterface $struct
-     * @return string
-     */
-    public function getTopicBody(StructInterface $struct, $options = JSON_UNESCAPED_UNICODE)
-    {
-        return $struct->toJson($options);
+        return $this->topicTag;
     }
 
     /**
      * Logic执行完成之后的MQ业务检查
      * @param StructInterface $struct
+     * @return mixed
      */
-    final public function afterFactory(StructInterface $struct)
+    final public function afterFactory($struct)
     {
-        $data = [
-            'message' => '',
-            'delay' => $this->getTopicDelay()
-        ];
-        // 1. Topic名称必须
+        $data = [];
+        // 1. 检查是否需要发送MQ消息
         $data['topicName'] = $this->getTopicName();
-        if (!$data['topicName']) {
-            return;
-        }
-        // 2. FilterTag必须
-        //    2.1 从属性或覆盖方法中读取
-        //    2.2 类名中读取
         $data['filterTag'] = $this->getTopicTag();
-        if (!$data['filterTag']) {
-            return;
+        if (!$data['topicName'] || !$data['filterTag']) {
+            return false;
         }
-        // 3. 计算消息内容
-        $jsonOption = JSON_UNESCAPED_UNICODE;
-        $message = ['body' => $this->getTopicBody($struct, $jsonOption)];
-        $data['message'] = json_encode($message, $jsonOption);
-        // 4. 消息Logger
-        $uuid = uniqid();
+        // 2. 消息属性
         $logger = $this->di->getLogger('mbs');
-        $logger->info("[{$uuid}] - 准备MQ消息");
-        $logger->info("[{$uuid}] - 用[{$data['filterTag']}]标签, 发到[{$data['topicName']}]主题");
-        $logger->info("[{$uuid}] - 消息内容 - {$data['message']}");
-        // 5. 开始发送
-        $logger->info("[{$uuid}] - 开始发送MQ消息");
-        $response = $this->serviceSdk->mbs->publish($data);
-        if ($response->hasError()) {
-            $logger->info("[{$uuid}] - 发送MQ消息失败 - ({$response->getErrno()})".$response->getError());
-            return;
+        $data['priority'] = $this->getTopicPriority();
+        $data['delaySeconds'] = $this->getTopicDelay();
+        // 3. 单条发送
+        if (!$this->topicBatch) {
+            $data['message'] = '';
+            if (count($this->topicBatches) > 0) {
+                $data['message'] = json_encode($this->topicBatches[0], JSON_UNESCAPED_UNICODE);
+            } else if ($struct instanceof StructInterface) {
+                $data['message'] = $struct->toJson();
+            }
+            // 4. 空消息忽略
+            if ($data['message'] === '') {
+                $logger->error("[".__METHOD__."] - MQ消息内容为空, 忽略发送");
+                return false;
+            }
+            // 5. 开始发送
+            $response = $this->serviceSdk->mbs->publish($data);
+            if ($response->hasError()) {
+                $logger->error("[".__METHOD__."] - MQ消息发送失败 - ".$response->__toString());
+                return false;
+            }
+            // 6. 发送成功
+            $logger->info("[".__METHOD__."] - MQ消息发送成功 - ".$response->__toString());
+            return true;
         }
-        // 6. 发送完成
-        $logger->info("[{$uuid}] - 发送MQ消息完成 - ".$response->__toString());
+        // 7. 批量执行
+        $offset = 0;
+        $uniqid = uniqid();
+        $logger->info("[".__METHOD__."][{$uniqid}] - 发送批量消息开始");
+        foreach ($this->topicBatches as $batch) {
+            $response = $this->serviceSdk->mbs->batch([
+                'base' => $data,
+                'messages' => $batch
+            ]);
+            $offset++;
+            if ($response->hasError()) {
+                $logger->error("[".__METHOD__."][{$uniqid}] - 第{$offset}批失败 - 用时{$response->getDuration()}秒 - ".$response->__toString());
+            } else {
+                $logger->info("[".__METHOD__."][{$uniqid}] - 第{$offset}批成功 - 用时{$response->getDuration()}秒 -".$response->__toString());
+            }
+        }
+        $logger->info("[".__METHOD__."][{$uniqid}] - 发送批量消息结束 - 共{$offset}批");
+        return true;
     }
 }
