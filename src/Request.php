@@ -58,61 +58,24 @@ class Request extends PhalconRequest
         // 2. 数组模式
         if ($assoc) {
             // 2.1 是否为MQ消息
-            if (isset($data['messageBodyMD5'], $data['messageBody']) && strtoupper($data['messageBodyMD5']) === strtoupper(md5($data['messageBody']))) {
-                // 2.1.1 解析失败
-                $temp = null;
-                if (!$this->generageRawBody($temp, $data['messageBody'], $assoc)) {
-                    return $temp;
-                }
-                // 2.1.2 必须字段
-                if (!isset($temp['Message'], $temp['MessageMD5']) || strtoupper($temp['MessageMD5']) !== strtoupper(md5($temp['Message']))) {
-                    return $this->generateError('not MQ message format', $data['messageBody'], $assoc);
-                }
-                // 2.1.3 消息内容
-                $result = null;
-                if (!$this->generageRawBody($result, $temp['Message'], $assoc) || !isset($result['body'])) {
-                    return $this->generateError('not MQ message body', $temp['Message'], $assoc);
-                }
-                if (!isset($result['body']) || !$this->generageRawBody($result, $result['body'], $assoc)) {
-                    return $result;
-                }
-                // 2.1.4 MQ消息处理
+            if (isset($data['messageId'], $data['messageMd5'], $data['topicName'], $data['filterTag'], $data['message'])) {
                 $this->_mqRequest = true;
-                $this->_mqId = isset($temp['MessageId']) ? $temp['MessageId'] : '';
-                $this->_mqTopic = isset($temp['TopicName']) ? $temp['TopicName'] : '';
-                $this->_mqSubscription = isset($temp['SubscriptionName']) ? $temp['SubscriptionName'] : '';
-                $this->_mqFilterTag = isset($temp['MessageTag']) ? $temp['MessageTag'] : '';
-                return $result;
+                $this->_mqId = $data['messageId'];
+                $this->_mqTopic = $data['topicName'];
+                $this->_mqFilterTag = $data['filterTag'];
+                return $data['message'];
             }
             // 2.2 普通请求
             return $data;
         }
         // 3. STD模式
-        if (isset($data->messageBodyMD5, $data->messageBody) && strtoupper($data->messageBodyMD5) === strtoupper(md5($data->messageBody))) {
-            $temp = null;
-            // 3.1 解析失败
-            if (!$this->generageRawBody($temp, $data->messageBody, $assoc)) {
-                return $temp;
-            }
-            // 3.2 必须字段
-            if (!isset($temp->Message, $temp->MessageMD5) || strtoupper($temp->MessageMD5) !== strtoupper(md5($temp->Message))) {
-                return $this->generateError('not MQ message format', $data->messageBody, $assoc);
-            }
-            // 3.3 消息内容
-            $result = null;
-            if (!$this->generageRawBody($result, $temp->Message, $assoc) || !isset($result->body)) {
-                return $this->generateError('not MQ message body', $data->messageBody, $assoc);
-            }
-            if (!isset($result->body) || !$this->generageRawBody($result, $result->body, $assoc)) {
-                return $result;
-            }
+        if (isset($data->messageId, $data->messageMd5, $data->topicName, $data->filterTag, $data->message)) {
             // 3.4 MQ消息处理
             $this->_mqRequest = true;
-            $this->_mqId = isset($temp->MessageId) ? $temp->MessageId : '';
-            $this->_mqTopic = isset($temp->TopicName) ? $temp->TopicName : '';
-            $this->_mqSubscription = isset($temp->SubscriptionName) ? $temp->SubscriptionName : '';
-            $this->_mqFilterTag = isset($temp->MessageTag) ? $temp->MessageTag : '';
-            return $result;
+            $this->_mqId = $data->messageId;
+            $this->_mqTopic = $data->topicName;
+            $this->_mqFilterTag = $data->filterTag;
+            return $data->message;
         }
         return $data;
     }
