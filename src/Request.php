@@ -7,6 +7,7 @@ namespace Uniondrug\Framework;
 
 use Phalcon\Http\Request\Exception;
 use Phalcon\Http\Request as PhalconRequest;
+use stdClass;
 
 /**
  * 覆盖HTTP请求
@@ -15,106 +16,30 @@ use Phalcon\Http\Request as PhalconRequest;
 class Request extends PhalconRequest
 {
     /**
-     * 是否MQ请求
-     * @var bool
-     */
-    private $_mqRequest = false;
-    /**
-     * 消息ID
-     * @var string
-     */
-    private $_mqId;
-    /**
-     * 主题名称
-     * @var string
-     */
-    private $_mqTopic;
-    /**
-     * 主题TAG名称
-     * @var string
-     */
-    private $_mqFilterTag;
-    /**
-     * 订阅名称
-     * @var string
-     */
-    private $_mqSubscription;
-
-    /**
      * 读取请求入参数据
      * @param boolean $associative
-     * @return array|\stdClass
+     * @return array|stdClass
      */
     public function getJsonRawBody($associative = null)
     {
-        $data = null;
-        $assoc = $associative === true;
-        // 1. 获取BODY
-        $body = parent::getRawBody();
-        if (!$this->generageRawBody($data, $body, $assoc)) {
-            // 1.1 解析JSON出错
+        $body = $this->getRawBody();
+        // 1. 转为Array/StdClass
+        $data = json_decode($body, $associative);
+        if (json_last_error() === JSON_ERROR_NONE) {
             return $data;
         }
-        // 2. 数组模式
-        if ($assoc) {
-            // 2.1 是否为MQ消息
-            if (isset($data['messageId'], $data['messageMd5'], $data['topicName'], $data['filterTag'], $data['message'])) {
-                $this->_mqRequest = true;
-                $this->_mqId = $data['messageId'];
-                $this->_mqTopic = $data['topicName'];
-                $this->_mqFilterTag = $data['filterTag'];
-                return $data['message'];
-            }
-            // 2.2 普通请求
-            return $data;
-        }
-        // 3. STD模式
-        if (isset($data->messageId, $data->messageMd5, $data->topicName, $data->filterTag, $data->message)) {
-            // 3.4 MQ消息处理
-            $this->_mqRequest = true;
-            $this->_mqId = $data->messageId;
-            $this->_mqTopic = $data->topicName;
-            $this->_mqFilterTag = $data->filterTag;
-            return $data->message;
-        }
-        return $data;
-    }
-
-    /**
-     * 转为JSON字符串
-     * @param array|\stdClass $data
-     * @param string          $body
-     * @param bool            $assoc
-     * @return bool
-     */
-    private function generageRawBody(& $data, $body, $assoc = false)
-    {
-        $data = json_decode($body, $assoc);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $data = $this->generateError(json_last_error_msg(), $body, $assoc);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @param string $error
-     * @param string $raw
-     * @param bool   $assoc
-     * @return array|\stdClass
-     */
-    private function generateError($error, $raw, $assoc = false)
-    {
-        if ($assoc) {
+        // 2. Array错误
+        if ($associative) {
             return [
-                '_raw' => $raw,
-                '_error' => $error
+                '_raw' => $body,
+                '_err' => json_last_error_msg()
             ];
         }
-        $std = new \stdClass();
-        $std->_raw = $raw;
-        $std->_error = $error;
-        return $std;
+        // 3. JSON错误
+        $data = new stdClass();
+        $data->_err = json_last_error_msg();
+        $data->_raw = $body;
+        return $data;
     }
 
     /**
@@ -145,39 +70,48 @@ class Request extends PhalconRequest
     }
 
     /**
-     * 读取MQ消息ID
+     * MBS发过来的消息ID
      * @return string
      */
-    public function getMqId()
+    public function getMbsId()
     {
-        return $this->_mqId;
+        return $this->getHeader('MBS-ID');
     }
 
     /**
-     * 读取MQ的订阅名称
+     * MBS发过来的消息所在队列
      * @return string
      */
-    public function getMqSubscription()
+    public function getMbsQueue()
     {
-        return $this->_mqSubscription;
+        return $this->getHeader('MBS-QUEUE');
     }
 
     /**
-     * 读取MQ消息的Tag名称
+     * MBS发过来的消息所在标签
      * @return string
      */
     public function getMqTag()
     {
-        return $this->_mqFilterTag;
+        return $this->getHeader('MBS-TAG');
     }
 
     /**
-     * 读取MQ消息的Topic名称
+     * MBS发过来的消息所在主题
      * @return string
      */
-    public function getMqTopic()
+    public function getMbsTopic()
     {
-        return $this->_mqTopic;
+        return $this->getHeader('MBS-TOPIC');
+    }
+
+    /**
+     * [MBS]消息所以主题的MESSAGEID
+     * @return string
+     */
+    public function getMbsTopicId()
+    {
+        return $this->getHeader('MBS-TOPIC-ID');
     }
 
     /**
@@ -262,10 +196,6 @@ class Request extends PhalconRequest
             throw new Exception("Invalid HTTP method: non-string");
         }
         return false;
-    }
-
-    public function isMqRequest(){
-        return $this->_mqRequest;
     }
 
     /**

@@ -5,6 +5,7 @@
  */
 namespace Uniondrug\Framework\Logics;
 
+use stdClass;
 use Uniondrug\Framework\Injectable;
 use Uniondrug\Framework\Services\ServiceTrait;
 use Uniondrug\Structs\StructInterface;
@@ -17,167 +18,205 @@ abstract class Logic extends Injectable implements LogicInterface
 {
     use ServiceTrait;
     /**
-     * 是否批量消息
-     * @var bool
+     * 消息优选级
+     * 范围: 1~16
+     * 排序: 小到大, 即1为最高优先级
+     * 默认: 8
      */
-    public $topicBatch = false;
+    const LOGIC_DEFAULT_TOPIC_PRIORITY = 8;
     /**
-     * 延迟发送
-     * `0` : 不延迟
-     * `n` : 延迟时长(单位: 秒)
+     * MQ消息主题名称
+     * @var null|string
+     */
+    protected $topicName = null;
+    /**
+     * MQ消息标签名
+     * @var null|string
+     */
+    protected $topicTag = null;
+    /**
+     * MQ消息优先级
      * @var int
      */
-    public $topicDelay = 0;
+    protected $topicPriority = 0;
     /**
-     * Topic名称
-     * @var bool|string
+     * 待发送的消息内容列表
+     * @var array
      */
-    public $topicName = false;
-    /**
-     * Topic标签
-     * @var bool|string
-     */
-    public $topicTag = false;
-    /**
-     * MQ默认优先级
-     * @var int
-     */
-    public $priority = 0;
-    /**
-     * @var int
-     */
-    private $defaultPriority = 8;
-    private $topicBatches = [];
+    private $topicBodies = [];
 
     /**
-     * 逻辑工厂
-     * @param array|null|object $payload 入参
-     * @return array|StructInterface 逻辑执行结果
+     * 结构体工厂
+     * @param array|stdClass|null $payload
+     * @return mixed
      */
-    public static function factory($payload = null)
+    public static function factory($payload)
     {
+        // 1. new实例
         $logic = new static();
-        $struct = $logic->run($payload);
-        $logic->afterFactory($struct);
-        return $struct;
+        // 2. run过程
+        $logic->beforeRun();
+        $result = $logic->run($payload);
+        $logic->afterRun($result);
+        // 3. 默认消息内容
+        //    a): 在run/afterRun()中未调用过addTopicBody()方法
+        //    b): run()返回array|string|StructInterface时作为默认消息内容
+        $count = $logic->getTopicBodyCount();
+        if ($count === 0) {
+            if ($result instanceof StructInterface || in_array(gettype($result), [
+                    'array',
+                    'string'
+                ])
+            ) {
+                $logic->addTopicBody($result);
+            }
+        }
+        $logic->afterFactory($count);
+        // 4. 最后返回结果
+        return $result;
     }
 
     /**
-     * 分批执行
-     * @param array $datas
+     * @param array|string|StructInterface $result
      * @return $this
      */
-    protected function addTopicBatch(array $datas)
+    public function addTopicBody($result)
     {
-        $this->topicBatches[] = $datas;
+        $this->topicBodies[] = $result;
         return $this;
     }
 
     /**
-     * 读取延迟时长
-     * 指定消息来发送时间开始, N秒后才可被消费
-     * @return int
+     * 后续业务
+     * 1. 检查是否需要发MQ消息
+     * 2. 当需要发时自动切换发送方式
+     * @param int $count
      */
-    public function getTopicDelay()
+    public function afterFactory(int $count)
     {
-        if (is_numeric($this->topicDelay) && $this->topicDelay > 0) {
-            return $this->topicDelay;
+        // 1. 是否需要发MQ消息
+        $name = $this->getTopicName();
+        $tag = $this->getTopicTag();
+        if (!$name || !$tag) {
+            return;
         }
-        return 0;
+        $priority = $this->getTopicPriority();
+        $count > 1 ? $this->callMBSBatch($name, $tag, $priority) : $this->callMBSPublish($name, $tag, $priority);
     }
 
     /**
-     * 读取MQ消息名称
-     * 该方法可以子类中覆盖, 定义MQ的Topic名称,
-     * 默认为false, 即不发送MQ消息
-     * @return string|false
+     * run()运行之后
+     * @param mixed $result 值为run()方法的出参结果
+     */
+    public function afterRun($result)
+    {
+    }
+
+    /**
+     * 运行run()方法之前
+     */
+    public function beforeRun()
+    {
+    }
+
+    /**
+     * 待发送的消息数量
+     * @return int
+     */
+    public function getTopicBodyCount()
+    {
+        return count($this->topicBodies);
+    }
+
+    /**
+     * 读取MQ消息主题
+     * @return false|string
      */
     public function getTopicName()
     {
-        return $this->topicName;
-    }
-
-    /**
-     * 读取MQ优先级
-     * @return int
-     */
-    public function getTopicPriority()
-    {
-        if (is_numeric($this->priority) && $this->priority > 0) {
-            return $this->priority;
+        $topic = $this->topicName;
+        if (is_string($topic) && $topic !== '') {
+            return $topic;
         }
-        return $this->defaultPriority;
+        return false;
     }
 
     /**
      * 读取MQ消息标签
-     * 该方法可以子类中覆盖, 定义消息的Tag名称,
-     * 默认为实例逻辑的类名
-     * @return string
+     * @return false|string
      */
     public function getTopicTag()
     {
-        return $this->topicTag;
+        $tag = $this->topicTag;
+        if (is_string($tag) && $tag !== '') {
+            return $tag;
+        }
+        return false;
     }
 
     /**
-     * Logic执行完成之后的MQ业务检查
-     * @param StructInterface $struct
-     * @return mixed
+     * 读取MQ消息优先级
+     * @return int
      */
-    final public function afterFactory($struct)
+    public function getTopicPriority()
     {
-        $data = [];
-        // 1. 检查是否需要发送MQ消息
-        $data['topicName'] = $this->getTopicName();
-        $data['filterTag'] = $this->getTopicTag();
-        if (!$data['topicName'] || !$data['filterTag']) {
-            return false;
+        $priority = $this->topicPriority;
+        if (is_numeric($priority) && $priority >= 1 && $priority <= 16) {
+            return (int) $priority;
         }
-        // 2. 消息属性
-        $logger = $this->di->getLogger('mbs');
-        $data['priority'] = $this->getTopicPriority();
-        $data['delaySeconds'] = $this->getTopicDelay();
-        // 3. 单条发送
-        if (!$this->topicBatch) {
-            $data['message'] = '';
-            if (count($this->topicBatches) > 0) {
-                $data['message'] = json_encode($this->topicBatches[0], JSON_UNESCAPED_UNICODE);
-            } else if ($struct instanceof StructInterface) {
-                $data['message'] = $struct->toJson();
-            }
-            // 4. 空消息忽略
-            if ($data['message'] === '') {
-                $logger->error("[".__METHOD__."] - MQ消息内容为空, 忽略发送");
-                return false;
-            }
-            // 5. 开始发送
-            $response = $this->serviceSdk->mbs->publish($data);
-            if ($response->hasError()) {
-                $logger->error("[".__METHOD__."] - MQ消息发送失败 - ".$response->__toString());
-                return false;
-            }
-            // 6. 发送成功
-            $logger->info("[".__METHOD__."] - MQ消息发送成功 - ".$response->__toString());
-            return true;
-        }
-        // 7. 批量执行
-        $offset = 0;
-        $uniqid = uniqid();
-        $logger->info("[".__METHOD__."][{$uniqid}] - 发送批量消息开始");
-        foreach ($this->topicBatches as $batch) {
-            $response = $this->serviceSdk->mbs->batch([
-                'base' => $data,
-                'messages' => $batch
-            ]);
-            $offset++;
-            if ($response->hasError()) {
-                $logger->error("[".__METHOD__."][{$uniqid}] - 第{$offset}批失败 - 用时{$response->getDuration()}秒 - ".$response->__toString());
-            } else {
-                $logger->info("[".__METHOD__."][{$uniqid}] - 第{$offset}批成功 - 用时{$response->getDuration()}秒 -".$response->__toString());
+        return self::LOGIC_DEFAULT_TOPIC_PRIORITY;
+    }
+
+    /**
+     * 发送消息到MBS
+     * @param string $topicName
+     * @param string $topicTag
+     * @param int    $priority
+     */
+    private function callMBSBatch(string $topicName, string $topicTag, int $priority)
+    {
+        // 1. 组织消息内容
+        $contents = [
+            'topicName' => $topicName,
+            'topicTag' => $topicName,
+            'priority' => $priority,
+            'messages' => []
+        ];
+        // 2. 批量消息
+        foreach ($this->topicBodies as $body) {
+            if ($body instanceof StructInterface) {
+                $contents['messages'][] = $body;
+            } else if (is_array($body) || is_string($body)) {
+                $contents['messages'][] = $body;
             }
         }
-        $logger->info("[".__METHOD__."][{$uniqid}] - 发送批量消息结束 - 共{$offset}批");
-        return true;
+        // 3. 调用SDK
+        $this->serviceSdk->mbs2->batch($contents);
+    }
+
+    /**
+     * 向MBS发送一条消息
+     * @param string $topicName
+     * @param string $topicTag
+     * @param int    $priority
+     */
+    private function callMBSPublish(string $topicName, string $topicTag, int $priority)
+    {
+        // 1. 组织消息内容
+        $contents = [
+            'topicName' => $topicName,
+            'topicTag' => $topicName,
+            'priority' => $priority,
+            'message' => []
+        ];
+        // 2. 单条消息
+        $message = $this->topicBodies[0];
+        if ($message instanceof StructInterface) {
+            $contents['message'] = $message->toArray();
+        } else if (is_array($message) || is_string($message)) {
+            $contents['message'] = $message;
+        }
+        // 3. 调用SDK
+        $this->serviceSdk->mbs2->publish($contents);
     }
 }
