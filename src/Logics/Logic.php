@@ -178,7 +178,7 @@ abstract class Logic extends Injectable implements LogicInterface
         // 1. 组织消息内容
         $contents = [
             'topicName' => $topicName,
-            'topicTag' => $topicName,
+            'topicTag' => $topicTag,
             'priority' => $priority,
             'messages' => []
         ];
@@ -210,7 +210,7 @@ abstract class Logic extends Injectable implements LogicInterface
         // 1. 组织消息内容
         $contents = [
             'topicName' => $topicName,
-            'topicTag' => $topicName,
+            'topicTag' => $topicTag,
             'priority' => $priority,
             'message' => []
         ];
