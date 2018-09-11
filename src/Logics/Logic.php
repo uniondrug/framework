@@ -178,7 +178,7 @@ abstract class Logic extends Injectable implements LogicInterface
         // 1. 组织消息内容
         $contents = [
             'topicName' => $topicName,
-            'topicTag' => $topicName,
+            'topicTag' => $topicTag,
             'priority' => $priority,
             'messages' => []
         ];
@@ -191,7 +191,12 @@ abstract class Logic extends Injectable implements LogicInterface
             }
         }
         // 3. 调用SDK
-        $this->serviceSdk->mbs2->batch($contents);
+        $this->serviceSdk->mbs2->batch($contents, [
+            'headers' => [
+                'mbs-app' => $this->config->path('app.appName'),
+                'mbs-unique' => uniqid()
+            ]
+        ]);
     }
 
     /**
@@ -205,7 +210,7 @@ abstract class Logic extends Injectable implements LogicInterface
         // 1. 组织消息内容
         $contents = [
             'topicName' => $topicName,
-            'topicTag' => $topicName,
+            'topicTag' => $topicTag,
             'priority' => $priority,
             'message' => []
         ];
@@ -217,6 +222,11 @@ abstract class Logic extends Injectable implements LogicInterface
             $contents['message'] = $message;
         }
         // 3. 调用SDK
-        $this->serviceSdk->mbs2->publish($contents);
+        $this->serviceSdk->mbs2->publish($contents, [
+            'headers' => [
+                'mbs-app' => $this->config->path('app.appName'),
+                'mbs-unique' => uniqid()
+            ]
+        ]);
     }
 }
