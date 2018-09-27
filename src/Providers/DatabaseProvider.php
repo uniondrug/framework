@@ -63,9 +63,6 @@ class DatabaseProvider implements ServiceProviderInterface
      */
     private function registerService(string $name, $container, $manager, $config, $debug = false)
     {
-        echo "{$name}"; print_r ($config->toArray());
-
-
         // 1. 注册依赖服务
         $container->set($name, function() use ($manager, $config){
             $db = new Mysql($config->toArray());
