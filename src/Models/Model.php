@@ -128,12 +128,16 @@ abstract class Model extends PhalconModel
     }
 
     /**
-     * initialize timestamp when row changed
+     * Model初始化
      */
     public function initialize()
     {
-        // set useDynamicUpdate. 动态更新，即没有变化的字段在update时不会出现在sql里面。否则每次都是全字段更新。
+        // 1. 动态更新
+        //    即没有变化的字段在update时不会出现在sql里面。
+        //    否则每次都是全字段更新。
         $this->useDynamicUpdate(true);
+        // 2. 全局时间
+        //    数据Insert和最后的Update时间
         $this->addBehavior(new Timestampable([
             'beforeCreate' => [
                 'field' => [
@@ -145,12 +149,17 @@ abstract class Model extends PhalconModel
             'beforeUpdate' => [
                 'field' => 'gmtUpdated',
                 'format' => 'Y-m-d H:i:s',
-            ],
+            ]
         ]));
+        // 3. 读写分离
+        //    当未在config/database.php中配置slave
+        //    连接参数时, 将直接使用master配置
+        $this->setWriteConnectionService("db");
+        $this->setReadConnectionService("dbSlave");
     }
 
     /**
-     * 模型数据转
+     * 模型数据转JSON字符串
      * @return string
      */
     public function toJson()
