@@ -51,6 +51,22 @@ abstract class Model extends PhalconModel
     const MODEL_TIME_FORMAT_TIME = 'H:i';
 
     /**
+     * 覆盖SlaveConnection
+     * 当处于事务状态时, 固定返回writeConnection
+     */
+    public function getReadConnection()
+    {
+        /**
+         * @var \Phalcon\Db\Adapter\Pdo $connection
+         */
+        $connection = $this->getWriteConnection();
+        if ($connection->isUnderTransaction()) {
+            return $connection;
+        }
+        return parent::getReadConnection();
+    }
+
+    /**
      * 记录添加日期
      * @return string
      * @example return '2018-01-10';
