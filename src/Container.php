@@ -44,7 +44,7 @@ class Container extends Di
     /**
      * 版本号
      */
-    const VERSION = '2.8.8';
+    const VERSION = '2.11.2';
     /**
      * 应用路径
      * @var
@@ -253,10 +253,9 @@ class Container extends Di
      */
     public function logPath()
     {
-        if (defined("PHAR_WORKING_DIR")){
+        if (defined("PHAR_WORKING_DIR")) {
             return PHAR_WORKING_DIR.DIRECTORY_SEPARATOR.'log';
         }
-
         return $this->baseDir.DIRECTORY_SEPARATOR.'log';
     }
 
@@ -266,7 +265,7 @@ class Container extends Di
      */
     public function tmpPath()
     {
-        if (defined("PHAR_WORKING_DIR")){
+        if (defined("PHAR_WORKING_DIR")) {
             return PHAR_WORKING_DIR.DIRECTORY_SEPARATOR.'tmp';
         }
         return $this->baseDir.DIRECTORY_SEPARATOR.'tmp';
