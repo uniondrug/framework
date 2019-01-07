@@ -72,6 +72,10 @@ class Container extends Di
         $debug->listen(true, true);
         // 初始化容器
         parent::__construct();
+        // 在PHAR中路径重组
+        if (defined('PHAR_WORKING_DIR')) {
+            $baseDir = __DIR__.'/../../../../';
+        }
         // 设置主目录
         $this->setBaseDir($baseDir);
         // 从.env设置环境变量
