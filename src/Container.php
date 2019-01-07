@@ -230,6 +230,15 @@ class Container extends Di
     }
 
     /**
+     * Helpers: Get the base path.
+     * @return string
+     */
+    public function basePath()
+    {
+        return $this->baseDir;
+    }
+
+    /**
      * Helpers: Get the path to the application configuration files.
      * @return string
      */
@@ -244,6 +253,10 @@ class Container extends Di
      */
     public function logPath()
     {
+        if (defined("PHAR_WORKING_DIR")){
+            return PHAR_WORKING_DIR.DIRECTORY_SEPARATOR.'log';
+        }
+
         return $this->baseDir.DIRECTORY_SEPARATOR.'log';
     }
 
@@ -253,6 +266,9 @@ class Container extends Di
      */
     public function tmpPath()
     {
+        if (defined("PHAR_WORKING_DIR")){
+            return PHAR_WORKING_DIR.DIRECTORY_SEPARATOR.'tmp';
+        }
         return $this->baseDir.DIRECTORY_SEPARATOR.'tmp';
     }
 
