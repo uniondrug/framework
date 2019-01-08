@@ -73,7 +73,11 @@ class Container extends Di
         // 初始化容器
         parent::__construct();
         // 设置主目录
-        $this->setBaseDir($baseDir);
+        if (defined('PHAR_WORKING_DIR')) {
+            $this->setBaseDir(__DIR__.'/../../../../');
+        } else {
+            $this->setBaseDir($baseDir);
+        }
         // 从.env设置环境变量
         $this->initEnv();
         // 设置默认的服务

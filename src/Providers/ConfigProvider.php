@@ -22,35 +22,72 @@ class ConfigProvider implements ServiceProviderInterface
     public function register(\Phalcon\DiInterface $di)
     {
         /**
+         * 1. Phar模式
          * @var Container $di
          */
+        if ($this->registerWithPhar($di)) {
+            return;
+        }
+        /**
+         * 2. Consul模式
+         */
+        if ($this->registerWithTmp($di)) {
+            return;
+        }
+        // 3. Scan模式
+        $this->registerWithScan($di);
+    }
+
+    /**
+     * Phar模式
+     * 当项目以Phar模式发布时, 可通过打包时指定的环境配置
+     * 创建独立配置参数
+     * @param Container $di
+     * @return bool
+     */
+    private function registerWithPhar($di)
+    {
+        if (defined('PHAR_WORKING_FILE')) {
+            $file = __DIR__.'/../../../../../config.php';
+            if (file_exists($file)) {
+                $data = include($file);
+                if (is_array($data)) {
+                    $di->setShared('config', new Config($data));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * TMP模式
+     * 在执行composer update时, 从ConsulKV中拉取
+     * 配置参数, 并写入tmp/config.php中
+     * @param Container $di
+     * @return bool
+     */
+    private function registerWithTmp($di)
+    {
         $file = $di->tmpPath().'/config.php';
         if (file_exists($file)) {
-            $this->registerFromFilepath($di, $file);
-        } else {
-            $this->registerFromDirectory($di);
+            $data = include($file);
+            if (is_array($data)) {
+                $di->setShared('config', new Config($data));
+                return true;
+            }
         }
+        return false;
     }
 
     /**
-     * 从文件中加载配置
-     * 优选使用Composer创建的配置文件, 本文件已从Consul中的参数
-     * 提取关键字段, 并替换
+     * Scan模式
+     * 扫描项目所在的config目录, 从该目录下的php文件中
+     * 按环境变量参数读取配置
      * @param Container $di
-     * @param string    $file
+     * @return bool
      */
-    private function registerFromFilepath($di, $file)
-    {
-        $data = include($file);
-        $di->setShared('config', new Config($data));
-    }
-
-    /**
-     * 从目录中遍历文件
-     * 遍历指定目录下的全部文件, 将配置项合并加入配置清单
-     * @param Container $di
-     */
-    private function registerFromDirectory($di)
+    private function registerWithScan($di)
     {
         $di->setShared('config', function(){
             $env = \app()->environment();
@@ -79,5 +116,6 @@ class ConfigProvider implements ServiceProviderInterface
             }
             return $config;
         });
+        return true;
     }
 }
