@@ -44,7 +44,7 @@ class Container extends Di
     /**
      * 版本号
      */
-    const VERSION = '2.11.2';
+    const VERSION = '2.12.0';
     /**
      * 应用路径
      * @var
@@ -194,15 +194,6 @@ class Container extends Di
      */
     public function handleException($e)
     {
-        // Log
-        $logContext = [
-            'error' => $e->getMessage(),
-            'errno' => $e->getCode(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTraceAsString(),
-        ];
-        $this->getLogger("framework")->error("{error} ({errno}) in {file}:{line}\nStack trace:\n{trace}", $logContext);
         /**
          * @var \Uniondrug\Service\Server $server
          */
