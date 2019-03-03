@@ -21,18 +21,22 @@ class ConfigProvider implements ServiceProviderInterface
      */
     public function register(\Phalcon\DiInterface $di)
     {
-        /**
-         * 1. Phar模式
-         * @var Container $di
-         */
-        if ($this->registerWithPhar($di)) {
-            return;
-        }
-        /**
-         * 2. Consul模式
-         */
-        if ($this->registerWithTmp($di)) {
-            return;
+        if (defined("PHAR_WORKING_FILE")) {
+            /**
+             * 1. Consul模式
+             */
+            if ($this->registerWithTmp($di)) {
+                return;
+            }
+            /**
+             * 2. Phar模式
+             * @var Container $di
+             */
+            if (defined("PHAR_WORKING")) {
+                if ($this->registerWithPhar($di)) {
+                    return;
+                }
+            }
         }
         // 3. Scan模式
         $this->registerWithScan($di);
@@ -52,7 +56,7 @@ class ConfigProvider implements ServiceProviderInterface
             if (file_exists($file)) {
                 $data = include($file);
                 if (is_array($data)) {
-                    $di->setShared('config', new Config($data));
+                    $di->setShared('config', new Config($this->parseKvConfigurations($data)));
                     return true;
                 }
             }
@@ -73,7 +77,7 @@ class ConfigProvider implements ServiceProviderInterface
         if (file_exists($file)) {
             $data = include($file);
             if (is_array($data)) {
-                $di->setShared('config', new Config($data));
+                $di->setShared('config', new Config($this->parseKvConfigurations($data)));
                 return true;
             }
         }
@@ -117,5 +121,22 @@ class ConfigProvider implements ServiceProviderInterface
             return $config;
         });
         return true;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    private function parseKvConfigurations(& $data)
+    {
+        $resp = [];
+        foreach ($data as $key => $value) {
+            if (is_array($value) && isset($value['key'], $value['value'])) {
+                $resp[$key] = $value['value'];
+            } else {
+                $resp[$key] = $value;
+            }
+        }
+        return $resp;
     }
 }
