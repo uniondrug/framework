@@ -21,47 +21,15 @@ class ConfigProvider implements ServiceProviderInterface
      */
     public function register(\Phalcon\DiInterface $di)
     {
-        if (defined("PHAR_WORKING_FILE")) {
-            /**
-             * 1. Consul模式
-             */
-            if ($this->registerWithTmp($di)) {
-                return;
-            }
-            /**
-             * 2. Phar模式
-             * @var Container $di
-             */
-            if (defined("PHAR_WORKING")) {
-                if ($this->registerWithPhar($di)) {
-                    return;
-                }
-            }
+        /**
+         * 1. Consul模式
+         * @var Container $di
+         */
+        if ($this->registerWithTmp($di)) {
+            return;
         }
         // 3. Scan模式
         $this->registerWithScan($di);
-    }
-
-    /**
-     * Phar模式
-     * 当项目以Phar模式发布时, 可通过打包时指定的环境配置
-     * 创建独立配置参数
-     * @param Container $di
-     * @return bool
-     */
-    private function registerWithPhar($di)
-    {
-        if (defined('PHAR_WORKING_FILE')) {
-            $file = __DIR__.'/../../../../../config.php';
-            if (file_exists($file)) {
-                $data = include($file);
-                if (is_array($data)) {
-                    $di->setShared('config', new Config($this->parseKvConfigurations($data)));
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
