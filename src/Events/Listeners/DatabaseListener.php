@@ -1,179 +1,113 @@
 <?php
 /**
- * DatabaseListener.php
- *
+ * @author wsfuyibing <websearch@163.com>
+ * @date   2019-04-10
  */
-
 namespace Uniondrug\Framework\Events\Listeners;
 
 use Phalcon\Db\Profiler;
 use Phalcon\Events\Event;
 use Uniondrug\Framework\Injectable;
+use Uniondrug\Framework\Mysql as Connection;
 
 /**
- * Class DatabaseListener
- **/
+ * DB查询过程
+ * @package Uniondrug\Framework\Events\Listeners
+ */
 class DatabaseListener extends Injectable
 {
     /**
-     * @var \Phalcon\Db\Profiler
+     * @var Profiler
      */
     protected $profiler;
+    /**
+     * SQL慢查询
+     * 当SQL执行时长超时此值(0.5秒)时, 加入WARN级Logger
+     * @var float
+     */
+    protected $durationWarning = 0.5;
+    /**
+     * SQL报警
+     * 当SQL执行时长超时此值(1.0秒)时, 加入ERROR级Logger, 并发送报警
+     * @var float
+     */
+    protected $durationError = 1.0;
 
     /**
-     * Creates the profiler and starts the logging
+     * DatabaseListener constructor.
+     * @param int|null $error
+     * @param int|null $warning
      */
-    public function __construct()
+    public function __construct(int $error = null, int $warning = null)
     {
         $this->profiler = new Profiler();
+        $error === null || $this->durationError = (double) ($error / 1000);
+        $warning === null || $this->durationWarning = (double) ($warning / 1000);
     }
 
     /**
-     * This is executed if the event triggered is 'beforeQuery'
-     *
-     * @param \Phalcon\Events\Event                                $event
-     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
-     */
-    public function beforeQuery(Event $event, $connection)
-    {
-        $this->profiler->startProfile(
-            $connection->getSQLStatement(), $connection->getSQLVariables()
-        );
-    }
-
-    /**
-     * This is executed if the event triggered is 'afterQuery'
-     *
-     * @param \Phalcon\Events\Event                                $event
-     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
+     * SQL完成执行后
+     * @param Event      $event
+     * @param Connection $connection
      */
     public function afterQuery(Event $event, $connection)
     {
-        $processId = getmypid();
+        /**
+         * @var Profiler\Item $profile
+         */
         $this->profiler->stopProfile();
-
-        /** @var \Phalcon\Db\Profiler\Item $profile */
         $profile = $this->profiler->getLastProfile();
-        $sql = $profile->getSQLStatement();
-        $vars = $profile->getSQLVariables();
-        if (count($vars)) {
-            if ('select' == strtolower(substr($sql, 0, 6))) {
-                // 针对select的替换
-                $sql = str_replace(array_map(function ($v) {
-                    return ':' . $v;
-                }, array_keys($vars)), array_values($vars), $sql);
-            } else {
-                // 针对update/insert的替换
-                $replaced = 0;
-                $cursor = 0;
-                while ($s = substr($sql, $cursor, 1)) {
-                    if ($s == '?') {
-                        if (is_string($vars[$replaced])) {
-                            $replacement = "\"" . $vars[$replaced] . "\"";
-                        } else {
-                            $replacement = $vars[$replaced];
-                        }
-                        $sql = substr_replace($sql, $replacement, $cursor, 1);
+        $duration = (double) $profile->getTotalElapsedSeconds();
+        // 1. logger内容
+        $msg = sprintf("[d=%.06f][db=%s]", $duration, $connection->getSharedName());
+        // 2. 慢查询
+        if ($duration >= $this->durationWarning) {
+            // 2.1 太慢了
+            if ($duration >= $this->durationError) {
+                $this->logger->error($msg."SQL太慢 - ".$connection->getListenerSQLStatment());
+                return;
+            }
+            // 2.2 比较慢了
+            //     需引起重视了
+            $this->logger->warning($msg."SQL较慢 - ".$connection->getListenerSQLStatment());
+            return;
+        }
+        // 3. 普通查询
+        //    速度可以接受
+        $this->logger->info($msg."SQL完成 - ".$connection->getListenerSQLStatment());
+    }
 
-                        $cursor += strlen($replacement);
-                        $replaced++;
+    /**
+     * SQL开始执行前
+     * @param Event      $event
+     * @param Connection $connection
+     */
+    public function beforeQuery(Event $event, $connection)
+    {
+        $this->profiler->startProfile($connection->getSQLStatement());
+    }
+
+    /**
+     * @param string     $sql
+     * @param array|null $vars
+     * @return string
+     */
+    private function renderSqlStatment(string $sql, $vars = null)
+    {
+        if (is_array($vars)) {
+            foreach ($vars as $key => $value) {
+                if (!is_numeric($value)) {
+                    if (is_string($value)) {
+                        $value = "'{$value}'";
+                    } else if (is_null($value)) {
+                        $value = "NULL";
                     } else {
-                        $cursor++;
+                        $value = gettype($value);
                     }
                 }
+                $sql = str_replace(":{$key}", $value, $sql);
             }
         }
-
-        $start = $profile->getInitialTime();
-        $final = $profile->getFinalTime();
-        $total = $profile->getTotalElapsedSeconds();
-        \logger('database')->debug("[Database][$processId]: Start=$start, Final=$final, Total=$total, SQL=$sql");
-    }
-
-    /**
-     * @return \Phalcon\Db\Profiler
-     */
-    public function getProfiler()
-    {
-        return $this->profiler;
-    }
-
-    /**
-     * @param \Phalcon\Events\Event                                $event
-     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
-     */
-    public function beginTransaction(Event $event, $connection)
-    {
-        $processId = getmypid();
-        $start = microtime(1);
-        $level = $connection->getTransactionLevel();
-
-        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, Transaction start");
-    }
-
-    /**
-     * @param \Phalcon\Events\Event                                $event
-     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
-     * @param                                                      $savepointName
-     */
-    public function createSavepoint(Event $event, $connection, $savepointName)
-    {
-        $processId = getmypid();
-        $start = microtime(1);
-        $level = $connection->getTransactionLevel();
-
-        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, create savepoint $savepointName");
-    }
-
-    /**
-     * @param \Phalcon\Events\Event                                $event
-     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
-     */
-    public function rollbackTransaction(Event $event, $connection)
-    {
-        $processId = getmypid();
-        $start = microtime(1);
-        \logger('database')->debug("[Database][$processId]: Start=$start, rollback transaction");
-    }
-
-    /**
-     * @param \Phalcon\Events\Event                                $event
-     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
-     * @param                                                      $savepointName
-     */
-    public function rollbackSavepoint(Event $event, $connection, $savepointName)
-    {
-        $processId = getmypid();
-        $start = microtime(1);
-        $level = $connection->getTransactionLevel();
-
-        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, rollback savepoint $savepointName");
-    }
-
-    /**
-     * @param \Phalcon\Events\Event                                $event
-     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
-     */
-    public function commitTransaction(Event $event, $connection)
-    {
-        $processId = getmypid();
-        $start = microtime(1);
-        $level = $connection->getTransactionLevel();
-
-        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, commit transaction");
-    }
-
-    /**
-     * @param \Phalcon\Events\Event                                $event
-     * @param \Phalcon\Db\AdapterInterface|\Phalcon\Db\Adapter\Pdo $connection
-     * @param                                                      $savepointName
-     */
-    public function releaseSavepoint(Event $event, $connection, $savepointName)
-    {
-        $processId = getmypid();
-        $start = microtime(1);
-        $level = $connection->getTransactionLevel();
-
-        \logger('database')->debug("[Database][$processId]: Start=$start, level=$level, release savepoint $savepointName");
+        return $sql;
     }
 }

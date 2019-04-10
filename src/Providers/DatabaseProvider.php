@@ -1,75 +1,117 @@
 <?php
 /**
  * @author wsfuyibing <websearch@163.com>
- * @date   2018-09-27
+ * @date   2019-04-10
  */
 namespace Uniondrug\Framework\Providers;
 
 use Phalcon\Config;
-use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Di\ServiceProviderInterface;
-use Phalcon\Events\ManagerInterface;
+use Phalcon\DiInterface;
+use Uniondrug\Framework\Mysql;
 use Uniondrug\Framework\Container;
 use Uniondrug\Framework\Events\Listeners\DatabaseListener;
 
 /**
- * 注册数据库连接服务
+ * 注册DB连接
+ * 本类可用于多连接注册
  * @package Uniondrug\Framework\Providers
  */
 class DatabaseProvider implements ServiceProviderInterface
 {
+    private $_inited = false;
+    private $listenerEnabled = false;
+    private $listenerError = null;
+    private $listenerWarning = null;
+    private $slaveEnabled = false;
+
     /**
-     * 注册数据库连接
+     * 初始化Datatabase选项
+     * @param Container $di
      */
-    public function register(\Phalcon\DiInterface $di)
+    private function initDatabaseOptions($di)
     {
-        // 1. 读取数据库配置信息
-        //    config/database.php
-        $database = \config()->path('database');
-        if (!($database instanceof Config)) {
-            throw new \Exception("can not load database configuration from config/database.php.");
+        // 1. retry or not
+        if ($this->_inited) {
+            return;
         }
-        // 2. Required配置
-        if (!isset($database->connection) || !($database->connection instanceof Config)) {
-            throw new \Exception("can not load connection for master");
+        // 2. updte status
+        $this->_inited = true;
+        // 3. listener
+        $listener = $di->getConfig()->path('database.durationListener');
+        $this->listenerEnabled = $listener === true || $listener === 'true';
+        if ($this->listenerEnabled) {
+            $listenerError = $di->getConfig()->path('database.durationError');
+            // 4.1 error duration
+            if (is_numeric($listenerError) && $listenerError > 0.0) {
+                $this->listenerError = (double) $listenerError;
+            }
+            // 4.2 warning duration
+            $listenerWarning = $di->getConfig()->path('database.durationWarning');
+            if (is_numeric($listenerWarning) && $listenerWarning > 0.0) {
+                $this->listenerWarning = (double) $listenerWarning;
+            }
         }
-        /**
-         * 3. Master & Slave
-         * @var Config $master
-         * @var Config $slave
-         */
-        $master = $database->connection;
-        if (isset($database->slaveConnection) && ($database->slaveConnection instanceof Config)) {
-            $slave = $database->slaveConnection;
-        } else {
-            $slave = $master;
-        }
-        /**
-         * 4. 注册服务
-         * @var Container $di
-         */
-        $debug = isset($database->debug) && $database->debug === true;
-        $manager = \app()->getEventsManager();
-        $this->registerService('db', $di, $manager, $master, $debug);
-        $this->registerService('dbSlave', $di, $manager, $slave, $debug);
+        // 4. slave
+        $slave = $di->getConfig()->path('database.useSlave');
+        $this->slaveEnabled = $slave === true || $slave === 'true';
     }
 
     /**
      * 注册连接
-     * @param string           $name
-     * @param Container        $container
-     * @param ManagerInterface $manager
-     * @param Config           $config
+     * @param DiInterface $di
      */
-    private function registerService(string $name, $container, $manager, $config, $debug = false)
+    public function register(DiInterface $di)
     {
-        // 1. 注册依赖服务
-        $container->set($name, function() use ($manager, $config){
-            $db = new Mysql($config->toArray());
-            $db->setEventsManager($manager);
+        /**
+         * @var Container $di
+         * @var Config    $masterConnection
+         * @var Config    $slaveConnection
+         */
+        $masterConnection = $di->getConfig()->path('database.connection');
+        if ($masterConnection instanceof Config) {
+            $this->setShared($di, $masterConnection, 'db');
+            if ($this->slaveEnabled) {
+                $slaveConnection = $di->getConfig()->path('database.slaveConnection');
+                if ($slaveConnection instanceof Config) {
+                    $this->setShared($di, $slaveConnection, 'dbSlave');
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置DB依赖注入
+     * @param Container $di
+     * @param Config    $connection
+     * @param string    $name
+     * @throws \ErrorException
+     */
+    final public function setShared($di, $connection, string $name)
+    {
+        // 1. 前设置检查
+        $this->initDatabaseOptions($di);
+        // 2. 容器检查
+        if (!($di instanceof Container)) {
+            throw new \ErrorException("can not register {$name} of mysql to Container.");
+        }
+        // 3. 配置检查
+        if (!($connection instanceof Config)) {
+            throw new \ErrorException("can not register {$name} of mysql for Connection configuration.");
+        }
+        // 4. 加入容器
+        $di->addSharedDatabase($name, isset($connection->dbname) ? $connection->dbname : 'unknown');
+        // 5. 依赖注入
+        $di->setShared($name, function() use ($di, $connection, $name){
+            $di->getLogger()->info("[db={$name}]注入共享的{{$name}}连接");
+            $db = new Mysql($connection->toArray());
+            $db->setSharedName($name);
+            $db->setEventsManager($di->getEventsManager());
             return $db;
         });
-        // 2. 加入调试监听
-        $debug && $manager->attach($name, new DatabaseListener());
+        // 6. 事件监听
+        if ($this->listenerEnabled) {
+            $di->getEventsManager()->attach($name, new DatabaseListener($this->listenerError, $this->listenerWarning));
+        }
     }
 }

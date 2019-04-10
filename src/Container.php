@@ -60,6 +60,11 @@ class Container extends Di
         DatabaseProvider::class,
         LoggerProvider::class,
     ];
+    /**
+     * DB Shared列表
+     * @var array
+     */
+    protected $_sharedDatabases = [];
 
     /**
      * Container constructor.
@@ -281,5 +286,40 @@ class Container extends Di
     public function removeSharedInstance($name)
     {
         unset($this->_sharedInstances[$name]);
+    }
+
+    /**
+     * 添加共享的Database连接
+     * @param string $name
+     * @param string $dbname
+     * @return $this
+     */
+    public function addSharedDatabase(string $name, string $dbname)
+    {
+        $this->_sharedDatabases[$name] = $dbname;
+        return $this;
+    }
+
+    /**
+     * 移除共享的Database连接
+     * @param string $name
+     * @return $this
+     */
+    public function delSharedDatabase(string $name)
+    {
+        if (isset($this->_sharedDatabases[$name])) {
+            unset($this->_sharedDatabases[$name]);
+        }
+        return $this;
+    }
+
+    /**
+     * 读取
+     * @param string $name
+     * @return array
+     */
+    public function getSharedDatabaseKeys(string $name)
+    {
+        return array_keys($this->_sharedDatabases);
     }
 }
