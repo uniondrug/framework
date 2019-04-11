@@ -65,6 +65,7 @@ class Container extends Di
      * @var array
      */
     protected $_sharedDatabases = [];
+    protected $_sharedRedises = [];
 
     /**
      * Container constructor.
@@ -281,6 +282,7 @@ class Container extends Di
     }
 
     /**
+     * 移除共享实例
      * @param $name
      */
     public function removeSharedInstance($name)
@@ -301,6 +303,18 @@ class Container extends Di
     }
 
     /**
+     * 添加共享的Redis连接
+     * @param string $name
+     * @param int    $index
+     * @return $this
+     */
+    public function addSharedRedis(string $name, int $index)
+    {
+        $this->_sharedRedises[$name] = $index;
+        return $this;
+    }
+
+    /**
      * 移除共享的Database连接
      * @param string $name
      * @return $this
@@ -314,12 +328,33 @@ class Container extends Di
     }
 
     /**
-     * 读取
+     * 移除共享的Redis连接
      * @param string $name
+     * @return $this
+     */
+    public function delSharedRedis(string $name)
+    {
+        if (isset($this->_sharedRedises[$name])) {
+            unset($this->_sharedRedises[$name]);
+        }
+        return $this;
+    }
+
+    /**
+     * 读取共享的Database连接
      * @return array
      */
-    public function getSharedDatabaseKeys(string $name)
+    public function getSharedDatabaseKeys()
     {
         return array_keys($this->_sharedDatabases);
+    }
+
+    /**
+     * 读取共享的Redis连接
+     * @return array
+     */
+    public function getSharedRedisKeys()
+    {
+        return array_keys($this->_sharedRedises);
     }
 }

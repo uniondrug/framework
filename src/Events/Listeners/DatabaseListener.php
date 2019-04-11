@@ -87,27 +87,4 @@ class DatabaseListener extends Injectable
         $this->profiler->startProfile($connection->getSQLStatement());
     }
 
-    /**
-     * @param string     $sql
-     * @param array|null $vars
-     * @return string
-     */
-    private function renderSqlStatment(string $sql, $vars = null)
-    {
-        if (is_array($vars)) {
-            foreach ($vars as $key => $value) {
-                if (!is_numeric($value)) {
-                    if (is_string($value)) {
-                        $value = "'{$value}'";
-                    } else if (is_null($value)) {
-                        $value = "NULL";
-                    } else {
-                        $value = gettype($value);
-                    }
-                }
-                $sql = str_replace(":{$key}", $value, $sql);
-            }
-        }
-        return $sql;
-    }
 }

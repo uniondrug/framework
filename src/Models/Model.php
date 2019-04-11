@@ -49,6 +49,7 @@ abstract class Model extends PhalconModel
     const MODEL_TIME_FORMAT_DATE = 'Y-m-d';
     const MODEL_TIME_FORMAT_DATETIME = 'Y-m-d H:i';
     const MODEL_TIME_FORMAT_TIME = 'H:i';
+    private $_modelUseSlave = false;
 
     /**
      * 覆盖SlaveConnection
@@ -59,9 +60,11 @@ abstract class Model extends PhalconModel
         /**
          * @var \Phalcon\Db\Adapter\Pdo $connection
          */
-        $connection = $this->getWriteConnection();
-        if ($connection->isUnderTransaction()) {
-            return $connection;
+        if ($this->_modelUseSlave) {
+            $connection = $this->getWriteConnection();
+            if ($connection->isUnderTransaction()) {
+                return $connection;
+            }
         }
         return parent::getReadConnection();
     }
@@ -148,6 +151,7 @@ abstract class Model extends PhalconModel
      */
     public function initialize()
     {
+        $this->_modelUseSlave = $this->getDI()->getConfig()->path('database.useSlave') === true;
         // 1. 动态更新
         //    即没有变化的字段在update时不会出现在sql里面。
         //    否则每次都是全字段更新。
@@ -169,9 +173,14 @@ abstract class Model extends PhalconModel
         ]));
         // 3. 读写分离
         //    当未在config/database.php中配置slave
-        //    连接参数时, 将直接使用master配置
-        $this->setWriteConnectionService("db");
-        $this->setReadConnectionService("dbSlave");
+        if ($this->_modelUseSlave) {
+            // Master/Slave模式
+            $this->setWriteConnectionService("db");
+            $this->setReadConnectionService("dbSlave");
+        } else {
+            // Master模式
+            $this->setConnectionService("db");
+        }
     }
 
     /**
