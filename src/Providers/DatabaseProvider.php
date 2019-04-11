@@ -87,6 +87,8 @@ class DatabaseProvider implements ServiceProviderInterface
         // 4. set shared
         $di->setShared($name, function() use ($di, $config, $name){
             $di->getLogger()->info(sprintf("[db=%s]注入{%s}为共享的DB连接.", $name, $name));
+            $dn = isset($config->dbname) ? $config->dbname : 'unknown';
+            $di->addSharedDatabase($name, $dn);
             $db = new Mysql($config->toArray());
             $db->setSharedName($name);
             $db->setEventsManager($di->getEventsManager());
