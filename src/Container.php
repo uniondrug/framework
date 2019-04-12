@@ -44,7 +44,7 @@ class Container extends Di
     /**
      * 版本号
      */
-    const VERSION = '2.13.0';
+    const VERSION = '2.14.0';
     /**
      * 应用路径
      * @var
@@ -60,6 +60,12 @@ class Container extends Di
         DatabaseProvider::class,
         LoggerProvider::class,
     ];
+    /**
+     * DB Shared列表
+     * @var array
+     */
+    protected $_sharedDatabases = [];
+    protected $_sharedRedises = [];
 
     /**
      * Container constructor.
@@ -276,10 +282,79 @@ class Container extends Di
     }
 
     /**
+     * 移除共享实例
      * @param $name
      */
     public function removeSharedInstance($name)
     {
         unset($this->_sharedInstances[$name]);
+    }
+
+    /**
+     * 添加共享的Database连接
+     * @param string $name
+     * @param string $dbname
+     * @return $this
+     */
+    public function addSharedDatabase(string $name, string $dbname)
+    {
+        $this->_sharedDatabases[$name] = $dbname;
+        return $this;
+    }
+
+    /**
+     * 添加共享的Redis连接
+     * @param string $name
+     * @param int    $index
+     * @return $this
+     */
+    public function addSharedRedis(string $name, int $index)
+    {
+        $this->_sharedRedises[$name] = $index;
+        return $this;
+    }
+
+    /**
+     * 移除共享的Database连接
+     * @param string $name
+     * @return $this
+     */
+    public function delSharedDatabase(string $name)
+    {
+        if (isset($this->_sharedDatabases[$name])) {
+            unset($this->_sharedDatabases[$name]);
+        }
+        return $this;
+    }
+
+    /**
+     * 移除共享的Redis连接
+     * @param string $name
+     * @return $this
+     */
+    public function delSharedRedis(string $name)
+    {
+        if (isset($this->_sharedRedises[$name])) {
+            unset($this->_sharedRedises[$name]);
+        }
+        return $this;
+    }
+
+    /**
+     * 读取共享的Database连接
+     * @return array
+     */
+    public function getSharedDatabaseKeys()
+    {
+        return array_keys($this->_sharedDatabases);
+    }
+
+    /**
+     * 读取共享的Redis连接
+     * @return array
+     */
+    public function getSharedRedisKeys()
+    {
+        return array_keys($this->_sharedRedises);
     }
 }
