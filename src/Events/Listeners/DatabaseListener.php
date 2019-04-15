@@ -9,6 +9,7 @@ use Phalcon\Db\Profiler;
 use Phalcon\Events\Event;
 use Uniondrug\Framework\Injectable;
 use Uniondrug\Framework\Mysql as Connection;
+use Uniondrug\Framework\Mysql;
 
 /**
  * DB查询过程
@@ -59,22 +60,28 @@ class DatabaseListener extends Injectable
         $profile = $this->profiler->getLastProfile();
         $duration = (double) $profile->getTotalElapsedSeconds();
         // 1. logger内容
-        $msg = sprintf("[d=%.06f][db=%s]", $duration, $connection->getSharedName());
+        if ($connection instanceof Mysql) {
+            $sql = $connection->getListenerSQLStatment();
+            $msg = sprintf("[d=%.06f][db=%s]", $duration, $connection->getSharedName());
+        } else {
+            $sql = $connection->getSQLStatement();
+            $msg = sprintf("[d=%.06f]", $duration);
+        }
         // 2. 慢查询
         if ($duration >= $this->durationWarning) {
             // 2.1 太慢了
             if ($duration >= $this->durationError) {
-                $this->logger->error($msg."SQL太慢 - ".$connection->getListenerSQLStatment());
+                $this->logger->error($msg."SQL太慢 - ".$sql);
                 return;
             }
             // 2.2 比较慢了
             //     需引起重视了
-            $this->logger->warning($msg."SQL较慢 - ".$connection->getListenerSQLStatment());
+            $this->logger->warning($msg."SQL较慢 - ".$sql);
             return;
         }
         // 3. 普通查询
         //    速度可以接受
-        $this->logger->info($msg."SQL完成 - ".$connection->getListenerSQLStatment());
+        $this->logger->info($msg."SQL完成 - ".$sql);
     }
 
     /**
@@ -86,5 +93,4 @@ class DatabaseListener extends Injectable
     {
         $this->profiler->startProfile($connection->getSQLStatement());
     }
-
 }
