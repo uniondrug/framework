@@ -62,7 +62,7 @@ class DatabaseListener extends Injectable
         // 1. logger内容
         if ($connection instanceof Mysql) {
             $sql = $connection->getListenerSQLStatment();
-            $msg = sprintf("[d=%.06f][db=%s]", $duration, $connection->getSharedName());
+            $msg = sprintf("[d=%.06f][db=%s:%s]", $duration, $connection->getSharedName(), $connection->getSharedDbname());
         } else {
             $sql = $connection->getSQLStatement();
             $msg = sprintf("[d=%.06f]", $duration);
