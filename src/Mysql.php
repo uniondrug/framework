@@ -16,6 +16,7 @@ class Mysql extends \Phalcon\Db\Adapter\Pdo\Mysql
      * @var string
      */
     private $_sharedName;
+    private $_sharedDbname;
 
     /**
      * 读取完整SQL语句
@@ -55,6 +56,14 @@ class Mysql extends \Phalcon\Db\Adapter\Pdo\Mysql
     }
 
     /**
+     * @return string
+     */
+    public function getSharedDbname()
+    {
+        return $this->_sharedDbname;
+    }
+
+    /**
      * 设置共享名称
      * @param string $name
      * @return $this
@@ -62,6 +71,16 @@ class Mysql extends \Phalcon\Db\Adapter\Pdo\Mysql
     public function setSharedName(string $name)
     {
         $this->_sharedName = $name;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function setSharedDbname(string $name)
+    {
+        $this->_sharedDbname = $name;
         return $this;
     }
 }
