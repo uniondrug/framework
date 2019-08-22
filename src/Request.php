@@ -16,6 +16,28 @@ use stdClass;
 class Request extends PhalconRequest
 {
     /**
+     * 读取客户端IP地址
+     * @param null $trustForwardedHeader
+     * @return string
+     */
+    public function getClientAddress($trustForwardedHeader = null)
+    {
+        /**
+         * 提取://X-REAL-IP
+         */
+        if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+            $realIp = trim($_SERVER['HTTP_X_REAL_IP']);
+            if ($realIp !== '') {
+                return $realIp;
+            }
+        }
+        /**
+         * 提取://Phalcon
+         */
+        return parent::getClientAddress($trustForwardedHeader);
+    }
+
+    /**
      * 读取请求入参数据
      * @param boolean $associative
      * @return array|stdClass
