@@ -13,6 +13,7 @@ use Uniondrug\Framework\Providers\ConfigProvider;
 use Uniondrug\Framework\Providers\DatabaseProvider;
 use Uniondrug\Framework\Providers\LoggerProvider;
 use Uniondrug\Framework\Providers\RouterProvider;
+use Uniondrug\Framework\Providers\TraceProvider;
 
 /**
  * 以下是可以通过 __call() 魔术方法调用的服务（注：依赖其他组件的，需要先引入组件）
@@ -37,14 +38,13 @@ use Uniondrug\Framework\Providers\RouterProvider;
  * @method \Uniondrug\Middleware\MiddlewareManager getMiddlewareManager()
  * @method \Phalcon\Cache\BackendInterface getCache(int $lifetime = null)
  * @method \Uniondrug\HttpClient\Client getHttpClient()
- * @method \Uniondrug\Trace\TraceClient getTraceClient()
  */
 class Container extends Di
 {
     /**
      * 版本号
      */
-    const VERSION = '2.15.2';
+    const VERSION = '2.16.0';
     /**
      * 应用路径
      * @var
@@ -59,6 +59,7 @@ class Container extends Di
         ConfigProvider::class,
         DatabaseProvider::class,
         LoggerProvider::class,
+        TraceProvider::class
     ];
     /**
      * DB Shared列表
