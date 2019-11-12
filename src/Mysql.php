@@ -5,6 +5,8 @@
  */
 namespace Uniondrug\Framework;
 
+use Phalcon\Di;
+
 /**
  * 共享的MySQL实例
  * @package Uniondrug\Framework
@@ -17,6 +19,34 @@ class Mysql extends \Phalcon\Db\Adapter\Pdo\Mysql
      */
     private $_sharedName;
     private $_sharedDbname;
+    /**
+     * @var Container
+     */
+    private $_container;
+
+    public function __construct($descriptor)
+    {
+        parent::__construct($descriptor);
+        $this->_container = Di::getDefault();
+    }
+
+    public function begin($nesting = null)
+    {
+        $this->_container->getLogger()->debug("transaction begin");
+        parent::begin($nesting);
+    }
+
+    public function commit($nesting = null)
+    {
+        parent::commit($nesting);
+        $this->_container->getLogger()->debug("transaction commit");
+    }
+
+    public function rollback($nesting = null)
+    {
+        parent::rollback($nesting);
+        $this->_container->getLogger()->debug("transaction rollback");
+    }
 
     /**
      * 读取完整SQL语句
