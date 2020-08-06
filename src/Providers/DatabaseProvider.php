@@ -11,6 +11,7 @@ use Phalcon\DiInterface;
 use Uniondrug\Framework\Container;
 use Uniondrug\Framework\Events\Listeners\DatabaseListener;
 use Uniondrug\Framework\Mysql;
+use Uniondrug\Framework\Postgresql;
 
 /**
  * 注册DB连接
@@ -38,6 +39,10 @@ class DatabaseProvider implements ServiceProviderInterface
      * @var int
      */
     private $warningDuration = 500;
+    private $pdo = [
+        'mysql' => Mysql::class,
+        'postgresql' => Postgresql::class,
+    ];
 
     /**
      * 注册连接
@@ -53,8 +58,9 @@ class DatabaseProvider implements ServiceProviderInterface
         if (!($master instanceof Config)) {
             return;
         }
+        $adapter = $di->getConfig()->path('database.adapter');
         // 2. register master
-        $this->setShared($di, $master, 'db');
+        $this->setShared($di, $master, 'db', $adapter);
         // 3. slave status
         $enable = $di->getConfig()->path('database.useSlave');
         if ($enable !== true) {
@@ -62,17 +68,18 @@ class DatabaseProvider implements ServiceProviderInterface
         }
         // 4. register slave
         $slave = $di->getConfig()->path('database.slaveConnection');
-        $this->setShared($di, $slave, 'dbSlave');
+        $this->setShared($di, $slave, 'dbSlave', $adapter);
     }
 
     /**
      * 设置注入
-     * @param Container $di
-     * @param Config    $config
-     * @param string    $name
+     * @param      $di
+     * @param      $config
+     * @param      $name
+     * @param null $adapter
      * @throws \ErrorException
      */
-    final protected function setShared($di, $config, $name)
+    final protected function setShared($di, $config, $name, $adapter = null)
     {
         // 1. container type
         if (!($di instanceof Container)) {
@@ -82,17 +89,38 @@ class DatabaseProvider implements ServiceProviderInterface
         if (!($config instanceof Config)) {
             throw new \ErrorException(sprintf("[db=%s]error database config for connection.", $name));
         }
+        $dbConfig = $config->toArray();
+        $pdo = Mysql::class;
+        $adapter = strtolower($adapter);
+        if ($adapter && $adapter != 'mysql') {
+            if (isset($this->pdo[$adapter])) {
+                $pdo = $this->pdo[$adapter];
+            } else {
+                throw new \ErrorException(sprintf("[db=%s]error adapter config for connection.", $adapter));
+            }
+        } else if (isset($dbConfig['adapter'])) {
+            $adapter = strtolower($dbConfig['adapter']);
+            if ($adapter && $adapter != 'mysql') {
+                if (isset($this->pdo[$adapter])) {
+                    $pdo = $this->pdo[$adapter];
+                } else {
+                    throw new \ErrorException(sprintf("[db=%s]error adapter config for connection.", $adapter));
+                }
+            }
+        }
         // 3. initialize
         $this->beforeSetShared($di);
         // 4. set shared
-        $di->setShared($name, function() use ($di, $config, $name){
+        $di->setShared($name, function() use ($di, $config, $name, $pdo){
+            unset($config->adapter);
             $dn = isset($config->dbname) ? $config->dbname : 'unknown';
             $di->addSharedDatabase($name, $dn);
             $di->getLogger()->info(sprintf("[db=%s:%s]注入SHARED的DB连接.", $name, $dn));
-            $db = new Mysql($config->toArray());
+            $db = new $pdo($config->toArray());
             $db->setSharedName($name);
             $db->setSharedDbname($dn);
             $db->setEventsManager($di->getEventsManager());
+            $di->getLogger()->info(sprintf("[db=%s:%s]注入SHARED的DB连接OK.", $name, $dn));
             return $db;
         });
         // 5. listener
