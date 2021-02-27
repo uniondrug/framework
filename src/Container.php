@@ -74,8 +74,8 @@ class Container extends Di
     public function __construct($baseDir = null)
     {
         // 初始化调试器
-        $debug = new \Phalcon\Debug();
-        $debug->listen(true, true);
+//        $debug = new \Phalcon\Debug();
+//        $debug->listen(true, true);
         // 初始化容器
         parent::__construct();
         // 设置主目录
